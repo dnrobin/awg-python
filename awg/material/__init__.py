@@ -1,9 +1,11 @@
 """
 awg.material is a package for modeling material chromatic dispersion.
 """
-import numpy as np
-from warnings import *
+
 from .Material import Material
+
+import numpy as np
+from warnings import warn
 
 # here we define some pre-existing material functions
 
@@ -102,7 +104,4 @@ def Ge(wvl, T = 295):
 	
 	return n
 
-def dispersion(function, wvl1, wvl2):
-    """calculates chromatic dispersion curve over wavelength range.
-    """
-    pass
+
