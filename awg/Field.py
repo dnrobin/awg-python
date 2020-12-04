@@ -1,55 +1,111 @@
 from core import *
 import numpy as np
-print(np.isreal([0,1,2,3,4,5]))
+
+
+#print([i for i in np.shape(([1,2,3],[1,2,3]))])
+
+def isvector(a):
+	dim = 0
+	for i in a:
+		if len(i) == 0:
+			pass
+		else:
+			dim +=1
+	if dim > 1:
+		return True
+	else:
+		return False
+
+print(isvector(([1,2,3],[2,3])))
+
+
+
+def DataFormat(D,sz):
+	if len(D) == 0:
+		D = np.zeros(sz)
+		return D
+	print(np.shape(D),sz)
+	shape_D = [1]
+	if len(np.shape(D))> 1:
+		shape_D = [i for i in np.shape(D)]
+	else:
+		shape_D.append(np.shape(D)[0])
+	print(shape_D)
+	s =[]
+	for i in sz:
+		if i > 1:
+			s.append(True)
+		else:
+			s.append(False)
+	if False not in s:
+		if shape_D != sz:
+			raise ValueError("Wrong data format. The field must contain the same number of rows as the y-coordinate points and the same number of columns as the x-coordinate points.")
+	
+
+
+	return D
+
+x = DataFormat(([1,2,3],[2,3]),[1,3])
+print(x)
 class Field:
 	def __init__(self,X, E,H):
 		self.scalar = True
 		if len(X) < 1:
 			raise ValueError("At least one coordinate vector must be provided.")
 
-		y = []
+		self.y = []
 		self.dimens = 1
 		
-		if len(X) <= 2:
+		#if len(X) <= 2:
 			### No equivalent of matlab cell in python
 			### Use numpy array for now, but will cause error
 			### if X have 2 or less coordinate
-			if type(X) == np.ndarray:
-				x = X[0]
+		if type(X) == tuple:
+			self.x = X[0]
 
-				if len(X) > 1 :
-					y = X[1]
-					self.dimens = 3
-					if len(x) == 0:
-						self.dimens = 2
-			### To complete later
-			else:
-				try:
-					n,m = np.shape(X) # cause error if vector 1 1D or if x and y are not the same length
-				except ValueError:
-					n = np.shape(X)
-					m = 0
-				if (n != 0) and (m != 0):
-					raise ValueError("Wrong coordinate format. Must be a 1-D vector.")
-				
-			###
-		x = X
-		if (len(x) == 0) and (len(y) == 0):
-			raise Error("At least one coordinate vector must be provided.")
-		if len(y) == 0:
-			if False in np.isreal(x):
-				raise ValueError("Cordinate vectors must be real numbers.")
+			if len(X) > 1 :
+				self.y = X[1]
+				self.dimens = 3
+				if len(self.x) == 0:
+					self.dimens = 2
+				if len(self.y) == 0:
+					self.dimens = 1
+
 		else:
-			if False in np.isreal(x) or False in np.isreal(y):
-				raise ValueError("Cordinate vectors must be real numbers.")
+			if len([i for i in np.shape(X)]) > 1:
+				raise ValueError("Wrong coordinate format. Must be a 1-D vector.")
+			self.x = X
 
-		self.Xdata = np.array([x,y])
-		sz = max([1,1],[len(y),len(x)])
+		if (len(self.x) == 0) and (len(self.y) == 0):
+			raise Error("At least one coordinate vector must be provided.")
+		
+		if False in np.isreal(self.x) or False in np.isreal(self.y):
+			raise ValueError("Cordinate vectors must be real numbers.")
+		self.Xdata = np.array([self.x,self.y])
+		sz = max([1,1],[len(self.y),len(self.x)])
 
 		if len(E) < 1:
 			raise ValueError("Electric field data is empty.")
-		Ex = []
-		Ey = []
-		Ez = []
+		self.Ex = []
+		self.Ey = []
+		self.Ez = []
 
-A = Field(np.array([[0,1,2,3,4,5],[0,2,1]]),[0,1,2],[0,-1,-2])
+		if type(E) == tuple:
+			if len(E) > 0:
+				self.scalar = False
+				self.Ex = E[0]
+
+			if len(E) > 1:
+					self.Ey = E[1]
+			
+			if len(E) > 2:
+				self.Ez = E[2]
+		else:
+			self.scalar = True
+			self.Ex = E
+
+		print(self.Ex)
+
+
+
+A = Field(([1,2,3],[5,2]),([0,1,2j],[5,2]),[0,-1,-2])
