@@ -274,11 +274,10 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax7.bar([i for i in range(1,AWG.N+1)],T, color = "b")
 		ax7.set_xlim(0,AWG.N+1)
 		ax7.set_title(f"Output transmission ($\\lambda$ = {lmbda0*1e3:.0f} nm)")
-		ax7.set_ylim(0,max(T)+0.01)
-		ax7.set_xlabel("Channel \#")
+		ax7.set_ylim(0,1)
+		ax7.set_xlabel("Channel #")
 		ax7.set_ylabel("Transmission")
 
-		plt.show()
 	return T
 
 def AWG_spectrum(AWG,lmbda0,bandwidth, **kwargs):
@@ -306,7 +305,9 @@ def AWG_spectrum(AWG,lmbda0,bandwidth, **kwargs):
 		ax1.set_ylabel('Transmission [dB]')
 		ax1.set_title("AWG Transmission Spectrum")
 		ax1.set_ylim(-40,0)
+		ax1.set_xlim(min(lmbda),max(lmbda))
 		plt.legend()
+		#plt.show()
 	return T, lmbda
 
 def AWG_analyse(lmbda,T):
@@ -355,7 +356,6 @@ def AWG_analyse(lmbda,T):
 	AT = -100
 	for i in [center_channel-1, center_channel+1]:
 		at = max(TdB[ia3:ib3+1,i])
-		print(len(TdB[ia3:ib3+1,i]))
 		AT = max(AT,at)
 
 	# 1dB bandwidth
@@ -378,9 +378,8 @@ def AWG_analyse(lmbda,T):
 	print(tabulate([['Insertion loss [dB]', IL], ['Loss non-uniformity [dB]', NU], ["Channel spacing [nm]", CS],["1dB bandwidth [nm]",BW1],["3dB bandwidth [nm]",BW3],["10dB bandwidth [nm]",BW10],["Non-adjacent crosstalk level [dB]",XT],["Adjacent crosstalk level [dB]",AT]], headers=['', 'Value']))
 #print(overlap([-1,-0.5,0,0.5,1],[-4.72e-03-3.11e-03j, -4.78e-03-3.15e-03j, -4.84e-03-3.19e-03j,-4.90e-03-3.22e-03j, -4.96e-03-3.26e-03j],[-310000.72e-03-52.11e-03j, -310000.78e-03-52.15e-03j, -310000.84e-03-52.19e-03j,-310000.90e-03-52.22e-03j, -310000.96e-03-52.26e-03j]))
 #eim_mode(1.550,AWG.w,AWG.h,np.inf,SiO2,Si3N4,SiO2)
-#AWG_simulate(AWG,AWG.lambda_c, plot = True,gaussian = True)
-T , lmbda = AWG_spectrum(AWG,AWG.lambda_c,0.012,sample = 100, plot = True, gaussian = True)
-AWG_analyse(lmbda,T)
-#plt.show()
+AWG_simulate(AWG,AWG.lambda_c+1e-3, plot = True)
+#T , lmbda = AWG_spectrum(AWG,AWG.lambda_c,0.012,sample = 100, plot = True, gaussian = True)
+#AWG_analyse(lmbda,T)
 
-
+plt.show()

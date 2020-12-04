@@ -5,7 +5,6 @@ import numpy as np
 import scipy as sc
 from scipy.optimize import root
 from Materials import *
-from matlab_equivalent_function import *
 import cmath
 
 
