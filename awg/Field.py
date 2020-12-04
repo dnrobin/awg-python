@@ -98,6 +98,12 @@ class Field:
 					DataFormat(self.Ey,sz),
 					DataFormat(self.Ez,sz))
 
+		self.Ex = self.Edata[0]
+		self.Ey = self.Edata[1]
+		self.Ez = self.Edata[2]
+
+
+
 		self.Hx = []
 		self.Hy = []
 		self.Hz = []
@@ -121,10 +127,12 @@ class Field:
 					DataFormat(self.Hz,sz))
 
 
-		print(self.Hy)
+		self.Hx = self.Hdata[0]
+		self.Hy = self.Hdata[1]
+		self.Hz = self.Hdata[2]
 
 		
-	
+		
 
 	def hasElectric(self):
 		if np.any([self.Edata]):
@@ -137,10 +145,12 @@ class Field:
 			return True
 		else:
 			return False
-	
+
+
+
 	def poynting(self):
 		if self.hasMagnetic :
-			return self.Ex*np.conjugate(self.Hy) - self.Ey*np.conjugate(self.Hx)
+			return  self.Ex*np.conjugate(self.Hy) - self.Ey*np.conjugate(self.Hx)
 
 A = Field([1,2,3],[0,1,2j],[0,-1,-2])
 B = A.poynting()
