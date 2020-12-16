@@ -3,9 +3,9 @@ import numpy as np
 
 
 def DataFormat(D,sz):
-	
+	print(D)
 	if len(D) == 0:
-		D = np.zeros(sz)
+		D = np.zeros(sz)[0]
 		return D
 	
 	shape_D = [1]
@@ -72,7 +72,7 @@ class Field:
 		if False in np.isreal(self.x) or False in np.isreal(self.y):
 			raise ValueError("Cordinate vectors must be real numbers.")
 		self.Xdata = np.array([self.x,self.y])
-		sz = max([1,1],[len(self.y),len(self.x)])
+		sz = [max([1,1][i],[len(self.y),len(self.x)][i]) for i in range(2)]
 
 		if len(E) < 1:
 			raise ValueError("Electric field data is empty.")
@@ -146,11 +146,33 @@ class Field:
 		else:
 			return False
 
-
-
 	def poynting(self):
-		if self.hasMagnetic :
+		if self.hasMagnetic() :
 			return  self.Ex*np.conjugate(self.Hy) - self.Ey*np.conjugate(self.Hx)
+		else:
+			return self.Ex*np.conj(self.Ex)
 
-A = Field([1,2,3],[0,1,2j],[0,-1,-2])
-B = A.poynting()
+	def power(self):
+		if self.dimens == 3:
+			return np.trapz(np.trapz(self.y, self.poynting()),self.x)
+		else:
+			if self.dimens == 1:
+
+				return np.trapz(self.poynting(),self.x)
+			else:
+				return np.trapz(self.poynting(),self.y)
+
+	def normalize(self,P = 1):
+		P0 = abs(self.power())
+		for i in range(len(self.Edata)):
+			for j in range(len(self.Edata[0])):
+				self.Edata[i][j] = self.Edata[i][j]*(P/P0)**0.5
+		for i in range(len(self.Hdata)):
+			for j in range(len(self.Hdata[0])):
+				self.Hdata[i][j] = self.Hdata[i][j]*(P/P0)**0.5
+		return self
+
+
+A = Field(([1,2,3,4]),[1,3j,4,5],[])
+B = A.normalize()
+print(B.poynting())
