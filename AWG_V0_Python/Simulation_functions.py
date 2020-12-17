@@ -107,23 +107,23 @@ class AWG_obj:
 AWG = AWG_obj()
 
 AWG.clad = SiO2
-AWG.core = Si
+AWG.core = Si3N4
 AWG.subs = SiO2
 
 AWG.lambda_c = 1.550
 
-AWG.w = 0.450
-AWG.h = 0.220
+AWG.w = 2
+AWG.h = 0.1
 
 AWG.N = 5
-AWG.M = 40
-AWG.m = 20
-AWG.R = 100
-AWG.d = 1.8
-AWG.do = 1.2
-AWG.wi = 1.0
-AWG.wg = AWG.d-0.2
-AWG.wo = 1.0
+AWG.M = 34
+AWG.m = 165
+AWG.R = 200
+AWG.d = 6
+AWG.do = 6
+AWG.wi = 6
+AWG.wg = 2
+AWG.wo = 6
 
 
 def AWG_simulate(AWG,lmbda0,**kwargs):
@@ -174,7 +174,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		return E
 	
 	def iw_function(lmbda0):
-		s = np.linspace(-0.5, 0.5, pp["sample"])*(2*AWG.wi)
+		s = np.linspace(-0.5, 0.5, pp["sample"],dtype = complex)*(2*AWG.wi)
 		E = aperture_mode(lmbda0, AWG.wi, AWG.h, np.inf, s)
 		return s,E
 
@@ -200,7 +200,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		return s0,E
 
 	def fpr2_function(lmbda0,s0,E0):
-		s = np.linspace(-0.5,0.5,pp["sample"])*(AWG.N + 4)*AWG.do;
+		s = np.linspace(-0.5,0.5,pp["sample"],dtype = complex)*(AWG.N + 4)*AWG.do;
 		theta = np.conjugate(s0)/AWG.R
 		xp = AWG.R*np.tan(theta)
 		dp = AWG.R*1/(np.cos(theta)) - AWG.R
@@ -241,7 +241,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax1.set_ylim(min(abs(E1)),max(abs(E1)))
 		ax1.set_xlim(min(s1),max(s1))
 		ax2 = ax1.twinx()
-		ax2.set_ylim(-1,1)
+		ax2.set_ylim(min(np.angle(E1)/np.pi),max(np.angle(E1)/np.pi))
 		ax2.plot(s1,np.angle(E1)/np.pi, color = "r", linewidth = 2)
 		ax2.set_ylabel("$\\phi/\\pi$")
 		
@@ -256,7 +256,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax4 = ax3.twinx()
 		ax4.plot(s2,np.unwrap(np.angle(E2)), color = "r", linewidth = 2)
 		ax4.set_ylabel("$\\phi$[rad]")
-		ax4.set_ylim(-1,1)
+		ax4.set_ylim(min(np.unwrap(np.angle(E2))),max(np.unwrap(np.angle(E2))))
 
 		fig,ax5 = plt.subplots()
 		ax5.plot(x3,abs(E3), color = "b", linewidth = 2)
@@ -268,7 +268,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax6 = ax5.twinx()
 		ax6.plot(x3, np.angle(E3)/np.pi, color = "r", linewidth = 2)
 		ax6.set_ylabel("$\\phi/\\pi$")
-		ax6.set_ylim(-1,1)
+		ax6.set_ylim(min(np.angle(E3)/np.pi),max(np.angle(E3)/np.pi))
 		
 		fig,ax7 = plt.subplots()
 		ax7.bar([i for i in range(1,AWG.N+1)],T, color = "b")
@@ -378,7 +378,7 @@ def AWG_analyse(lmbda,T):
 	print(tabulate([['Insertion loss [dB]', IL], ['Loss non-uniformity [dB]', NU], ["Channel spacing [nm]", CS],["1dB bandwidth [nm]",BW1],["3dB bandwidth [nm]",BW3],["10dB bandwidth [nm]",BW10],["Non-adjacent crosstalk level [dB]",XT],["Adjacent crosstalk level [dB]",AT]], headers=['', 'Value']))
 #print(overlap([-1,-0.5,0,0.5,1],[-4.72e-03-3.11e-03j, -4.78e-03-3.15e-03j, -4.84e-03-3.19e-03j,-4.90e-03-3.22e-03j, -4.96e-03-3.26e-03j],[-310000.72e-03-52.11e-03j, -310000.78e-03-52.15e-03j, -310000.84e-03-52.19e-03j,-310000.90e-03-52.22e-03j, -310000.96e-03-52.26e-03j]))
 #eim_mode(1.550,AWG.w,AWG.h,np.inf,SiO2,Si3N4,SiO2)
-AWG_simulate(AWG,AWG.lambda_c+1e-3, plot = True)
+AWG_simulate(AWG,AWG.lambda_c, plot = True)
 #T , lmbda = AWG_spectrum(AWG,AWG.lambda_c,0.012,sample = 100, plot = True, gaussian = True)
 #AWG_analyse(lmbda,T)
 
