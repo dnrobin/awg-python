@@ -127,7 +127,7 @@ class Field:
 		
 
 	def poynting(self):
-		if self._HasMagnetic() :
+		if self.HasMagnetic() :
 			return  self._Ex*np.conjugate(self._Hy) - self._Ey*np.conjugate(self._Hx)
 		else:
 			return self._Ex*np.conj(self._Ex)
@@ -190,7 +190,7 @@ class Field:
 		return self.dimens >2
 
 	def isElectroMagnetic(self):
-		return self._HasElectric and self._HasMagnetic
+		return self.HasElectric and self.HasMagnetic
 
 	def getSize(self):
 		return [max([1,1][i],[len(self._y),len(self._x)][i]) for i in range(2)]
