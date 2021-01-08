@@ -101,7 +101,7 @@ class AWG:
             else: 
                 raise ValueError("The array waveguide core height 'h' [um] must be positive and be a float or an integer.")
         else:
-            self._h = 0.450
+            self._h = 0.220
         
         if "t" in _in:
             if ((type(kwargs["t"]) == int) or (type(kwargs["t"]) == float)) and (kwargs["t"] >= 0):
