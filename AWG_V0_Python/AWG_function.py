@@ -48,6 +48,9 @@ def overlap(x,u,v,Hu = None,Hv = None):
 
 	return np.absolute(uv)**2/(uu*vv)
 
+print(overlap([1], [2],[3],[4],[5]))
+
+
 def slab_index(lmbda0,h,na,nc,ns,**kwargs):
 	_in = kwargs
 	if "N" not in _in.keys():
@@ -315,4 +318,4 @@ def eim_mode(lmbda0,w,h,e,na,nc,ns,**kwargs):
 
 
 #print(np.diff(np.array([0,1,2,3,4,4.5,5,10])))
-#print(overlap([1], [2],[3],[4],[5]))
+

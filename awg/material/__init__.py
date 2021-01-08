@@ -14,7 +14,7 @@ def Air(wvl):
 		wvl = [wvl]
 	return np.ones(len(wvl))
 
-def Si(wvl,T):
+def Si(wvl,T = 295):
 	""" Material Sellmeier equation for: Si @ T[20K, 300K], lambda[1.1µm, 5.6µm]
 	https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20070021411.pdf"""
 
