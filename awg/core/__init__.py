@@ -25,6 +25,13 @@ def mat_prod(a, ma1,ma2):
 	return a
 
 
+def list_to_array(lst,dtype = complex):
+	new_list = np.zeros(len(lst),dtype = dtype)
+	for i,j in enumerate(lst):
+		new_list[i] += j
+	return new_list
+
+
 def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 	""" Slabkwargsdex Guided mode effective index of planar waveguide.
 	
@@ -455,14 +462,55 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	return E,H,x,neff
 
 
-#wgmode(1.5,1,0.5,0.2,SiO2,Si,SiO2)
-for i in wgmode(1.5,1,0.5,0.2,SiO2,Si,SiO2, Polarisation = "TM"):
-	print(i)
-	for i in range(5):
-		print(" ")
 
-def diffract():
-    pass
+
+def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
+	"""	DIFFRACT   1-D propagation using diffraction integral.
+	
+	   u = DIFFRACT(lambda, ui, xi, xf, zf) Numerically solves the one 
+	   dimensional diffraction integral for propagation to the output 
+	   coordinate(s) given by (xf,zf) from the input plane given by (xi,0)
+	   with initial field distribution ui. The incoming light wave vector is 
+	   assumed to be aligned with z-axis and the traveling wave is described 
+	   by the retarded phase picture exp(-jkz).
+	
+	   u = DIFFRACT(..., METHOD) specifies which integral definition to use.
+	   The choices are:
+	       'rayleigh'  - (default) general purpose Rayleigh-Sommerfeld integral
+	       'fresnel'   - Fresnel-Kirchoff approximation."""
+
+	if (type(zf) == int) or (type(zf) == float) or (len(zf) == 1):
+		zf = zf*np.ones(len(xf),dtype = complex)
+	elif len(zf) != len(xf):
+		raise ValueError("Coordinate vectors xf and zf must be the same length.")
+
+	if type(ui) == list:
+		ui = list_to_array(ui)
+	if type(xi) == list:
+		xi = list_to_array(xi)
+	if type(xf) == list:
+		xf = list_to_array(xf)
+
+	k = 2*np.pi/lmbda0
+
+	uf = np.zeros(len(xf),dtype = complex)
+
+	for i in range(len(xf)):
+		r = np.sqrt((xf[i]-xi)**2+zf[i]**2)
+		if method == "rayleigh":
+
+			uf[i] = np.sqrt(k/(2j*np.pi))*np.trapz(ui*zf[i]/r**(3/2)*np.exp(-1j*k*r),xi)
+
+		elif method == "fresnel":
+
+			uf[i] = np.sqrt(1j/(lmbda0*zf[i]))*np.exp(-1j*k*zf[i])*np.trapz(ui*np.exp(-1j*k/(2*zf[i])*(xi-xf[i])**2),xi)
+		
+		else:
+			raise ValueError(f"Unrecognized {method} method.")
+
+	return uf
+
+#print(diffract(1.5,[0,1,2,3,2,1,0],[-3,-2,-1,0,1,2,3],[-5,-4,-3,-2,-1,0,1,2,3,4,5],[1.5], method = "fresnel"))
 
 def overlap():
     pass
