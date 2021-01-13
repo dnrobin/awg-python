@@ -69,11 +69,11 @@ def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 		kwargs["Polarisation"] = "TE"
 
 
-	if (type(na) == types.FunctionType) or (str(type(kwargs["na"])) == "<class 'material.Material.Material'>"):
+	if (type(na) == types.FunctionType) or (str(type(na)) == "<class 'material.Material.Material'>"):
 		na = na(lmbda0)
-	if (type(nc) == types.FunctionType) or (str(type(kwargs["nc"])) == "<class 'material.Material.Material'>"):
+	if (type(nc) == types.FunctionType) or (str(type(nc)) == "<class 'material.Material.Material'>"):
 		nc = nc(lmbda0)
-	if (type(ns) == types.FunctionType) or (str(type(kwargs["ns"])) == "<class 'material.Material.Material'>"):
+	if (type(ns) == types.FunctionType) or (str(type(ns)) == "<class 'material.Material.Material'>"):
 		ns = ns(lmbda0)
 
 	a0 = max(np.arcsin(ns/nc),np.arcsin(na/nc))
@@ -116,7 +116,7 @@ def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 
 
 def slabmode(lmbda0,t,na,nc,ns,**kwargs):
-    """Slab_mode  Guided mode electromagnetic fields of the planar waveguide.
+	"""Slab_mode  Guided mode electromagnetic fields of the planar waveguide.
 	
 	 DESCRIPTION:
 	   solves for the TE (or TM) mode fields of a 3-layer planar waveguide
@@ -157,40 +157,44 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 	if "y" not in _in.keys():
 		_in["y"] = []
 
-	if "Mode" in _in.keys():
-		if _in["Mode"] in ["TE","te","TM","tm"]:
+	if "Modes" not in kwargs.keys():
+		kwargs["Modes"] = np.inf
+	if "Polarisation" in _in.keys():
+		if _in["Polarisation"] in ["TE","te","TM","tm"]:
 			pass
 	else:
-		_in["Mode"] = "TE"
+		_in["Polarisation"] = "TE"
 
 	if "Range" not in _in.keys():
-		_in["Range"] = [-3*h,3*h]
-	if "sample" not in _in.keys():
-		_in["sample"] = 100
+		_in["Range"] = [-3*t,3*t]
+	if "points" not in _in.keys():
+		_in["points"] = 100
 
-	if type(na) == types.FunctionType:
+	if (type(na) == types.FunctionType) or (str(type(na)) == "<class 'material.Material.Material'>"):
 		na = na(lmbda0)
-	if type(nc) == types.FunctionType:
+	if (type(nc) == types.FunctionType) or (str(type(nc)) == "<class 'material.Material.Material'>"):
 		nc = nc(lmbda0)
-	if type(ns) == types.FunctionType:
+	if (type(ns) == types.FunctionType) or (str(type(ns)) == "<class 'material.Material.Material'>"):
 		ns = ns(lmbda0)
 
 	if _in["y"] == []:
-		y = np.linspace(_in["Range"][0],_in["Range"][1],_in["sample"])
+		y = np.linspace(_in["Range"][0],_in["Range"][1],_in["points"])
 	else:
 		y = _in["y"]
+	
+
 	i1 = []
 	i2 = []
 	i3 = []
-	for i in range(len(y)):
-		if y[i] < -h/2:
+	for i,e in enumerate(y):
+		if e < -t/2:
 			i1.append(i)
-		elif y[i] <= h/2 and y[i] >= -h/2:
+		elif e <= t/2 and y[i] >= -t/2:
 			i2.append(i)
 		else:
 			i3.append(i)
 
-	neff = slab_index(lmbda0,h,ns,nc,na,Mode = _in["Mode"])
+	neff = slabindex(lmbda0,t,ns,nc,na,Modes = _in["Modes"],Polarisation = _in["Polarisation"])
 	E = np.zeros((len(y), len(neff), 3), dtype=complex)
 	H = np.zeros((len(y), len(neff), 3), dtype=complex)
 	k0 = 2*np.pi/lmbda0
@@ -198,14 +202,16 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 		p = k0*np.sqrt(neff[m]**2 - ns**2)
 		k = k0*np.sqrt(nc**2 - neff[m]**2)
 		q = k0*np.sqrt(neff[m]**2 - na**2)
-		if _in["Mode"] in ["TE", "te"]:
+		
+		if _in["Polarisation"].upper() == "TE":
+			
 			f = 0.5*np.arctan2(k*(p - q),(k**2 + p*q))
 
-			C = np.sqrt(n0/neff[m]/(h + 1/p + 1/q))
+			C = np.sqrt(n0/neff[m]/(t + 1/p + 1/q))
 
-			Em1 = np.cos(k*h/2 + f)*np.exp(p*(h/2 + y[i1]))
+			Em1 = np.cos(k*t/2 + f)*np.exp(p*(t/2 + y[i1]))
 			Em2 = np.cos(k*y[i2] - f)
-			Em3 = np.cos(k*h/2 - f)*np.exp(q*(h/2 - y[i3]))
+			Em3 = np.cos(k*t/2 - f)*np.exp(q*(t/2 - y[i3]))
 			Em = np.concatenate((Em1,Em2,Em3))*C
 			
 
@@ -234,11 +240,15 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 			H[:,m,1] = Hm
 			#print(E[:,:,0],E[:,:,1],E[:,:,2])
 
-	return y,E,H
+	return E,H,y,neff
 
 
+x = slabmode(1.5,1,SiO2,Si,SiO2, points = 10)
+print(x)
 
-
+#a = [10,9,8,7,6,5,4,3,2,1,0]
+#for i, e in enumerate(a):
+#	print(i,e)
 
 
 
