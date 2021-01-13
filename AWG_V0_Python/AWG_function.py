@@ -48,7 +48,6 @@ def overlap(x,u,v,Hu = None,Hv = None):
 
 	return np.absolute(uv)**2/(uu*vv)
 
-print(overlap([1], [2],[3],[4],[5]))
 
 
 def slab_index(lmbda0,h,na,nc,ns,**kwargs):

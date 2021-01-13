@@ -512,5 +512,20 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 
 #print(diffract(1.5,[0,1,2,3,2,1,0],[-3,-2,-1,0,1,2,3],[-5,-4,-3,-2,-1,0,1,2,3,4,5],[1.5], method = "fresnel"))
 
-def overlap():
-    pass
+def overlap(x,u,v,hu = None,hv = None):
+	if (hu == None) and (hv == None):
+		uu = np.trapz((np.conj(u[:])*u[:]),x) 
+		vv = np.trapz((np.conj(v[:])*v[:]),x) 
+		uv = np.trapz((np.conj(u[:])*v[:]),x) 
+		return abs(uv)**2/(np.sqrt(uu)*np.sqrt(vv))
+	else:
+		if hu == None:
+			hu = np.zeros(len(hv),dtype = complex)
+		if hv == None:
+			hv = np.zeros(len(hu),dtype = complex)
+		uu = np.trapz(u[:]*np.conj(hu[:]),x);
+		vv = np.trapz(v*np.conj(hv),x);
+		uv = np.trapz(u[:]*np.conj(hv),x);
+		vu = np.trapz(v*np.conj(hu[:]),x);
+
+		return abs(np.real(uv*vu/vv)/np.real(uu))
