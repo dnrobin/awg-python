@@ -3,6 +3,26 @@ from material import *
 import types
 
 class Waveguide:
+	"""	 Waveguide class
+	
+	 General purpose waveguide class 
+	
+	              |<   w   >|
+	               _________           _____
+	              |         |            ^
+	  ___    _____|         |_____ 
+	   ^                                 h
+	   t                                  
+	  _v_    _____________________     __v__
+	
+	
+	 PROPERTIES:
+	
+	 w - core width
+	 h - core height
+	 t - slab thickess for rib waveguides (def. 0)
+	
+	 To represent a slab (planar) waveguide, choose t = h."""
 	__slots__ = [
 				"_clad",
 				"_core",
@@ -126,3 +146,4 @@ class Waveguide:
             self._t = t 
         else:
             raise ValueError("The array waveguide slab thickness 't' (for rib waveguides) [um] must be non-negative and be a float or an integer.")
+            

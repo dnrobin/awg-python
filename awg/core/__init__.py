@@ -35,8 +35,8 @@ def list_to_array(lst,dtype = complex):
 def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 	""" Slabkwargsdex Guided mode effective index of planar waveguide.
 	
-	DESCRIPTION:
-	Solves for the TE (or TM) effective index of a 3-layer slab waveguide
+	 DESCRIPTION:
+	 Solves for the TE (or TM) effective index of a 3-layer slab waveguide
 	           na          y
 	   ^   ----------      |
 	   t       nc          x -- z
