@@ -1,5 +1,5 @@
-from material.Material import Material
-from Waveguide import Waveguide
+from . import *
+from .. import Waveguide
 import numpy as np
 
 

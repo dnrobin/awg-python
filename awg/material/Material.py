@@ -1,14 +1,10 @@
 import types
-
-
-
-
 import numpy as np
 from warnings import warn
 
 # here we define some pre-existing material functions
 
-def Air(wvl):
+def Air(wvl, T = 295):
 	if (type(wvl) == int) or (type(wvl) == float) or ('numpy.float64' in str(type(wvl))):
 		wvl = [wvl]
 	return np.ones(len(wvl))
@@ -40,7 +36,7 @@ def Si(wvl,T = 295):
 		n[i] = (1+(S1*wvl[i]**2)/(wvl[i]**2-x1**2)+(S2*wvl[i]**2)/(wvl[i]**2-x2**2)+(S3*wvl[i]**2)/(wvl[i]**2-x3**2))**0.5
 	return n
 
-def SiO2(wvl):
+def SiO2(wvl, T = 295):
 	""" Material model (Sellmeier) for: SiO2 @ 20?C over (0.21µm - 6.7µm)
 	https://refractiveindex.info/?shelf=main&book=SiO2&page=Malitson"""
 
@@ -57,7 +53,7 @@ def SiO2(wvl):
 	return n
 
 
-def Si3N4(wvl):
+def Si3N4(wvl, T = 295):
 	"""% Material Sellmeier equation for: Si @ T[20K, 300K], lambda[1.1µm, 5.6µm]
 	https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20070021411.pdf"""
 

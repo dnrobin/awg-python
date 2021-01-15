@@ -7,7 +7,9 @@ import scipy as sc
 from scipy.optimize import root
 import cmath
 sys.path.append(os.path.abspath(os.path.join('..')))
-from material import *
+#from material import *
+
+
 
 def clamp(x,a,b):
 	return min(max(x,a),b)
@@ -247,8 +249,6 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 
 
 	return E,H,y,neff
-
-
 
 def wgindex(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	"""Effective index method for guided modes in arbitrary waveguide

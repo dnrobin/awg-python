@@ -1,5 +1,5 @@
-from core import *
-from material import *
+from .core import *
+from .material import *
 import types
 
 class Test:
@@ -532,15 +532,7 @@ class AWG:
             raise ValueError("The radial defocus 'df' must be a positive float or integer")
     
 
-    
-    
 
-
-
-
-A = AWG(d = 1.6)
-A.Ni = 1
-print(A.m,A.d, A.L0)
 
 def iw():
     pass
