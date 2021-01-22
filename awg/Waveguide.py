@@ -114,6 +114,41 @@ class Waveguide:
 
 		return dispersion.dispersion(self.groupindex,lmbda1,lmbda2,point = point)
 
+	def mode(self,lmbda,**kwargs):
+		
+		_in = kwargs.keys()
+		
+		if "x" in _in:
+			x = kwargs["x"]
+		else:
+			x = []
+		
+		if "ModeType" in _in :
+			ModeType = kwargs["ModeType"]
+		else:
+			ModeType = "gaussian"
+
+		if "XLimits" in _in:
+			XLimits = kwargs["XLimits"]
+		else:
+			XLimits = [-3*self._w,3*self._w]
+
+		if "points" in _in:
+			points = kwargs["points"]
+		else:
+			points = 100
+
+		n1 = self.core.index(lmbda)
+		n2 = self.clad.index(lmbda)
+		n3 = self.subs.index(lmbda)
+
+		if len(x) == 0:
+			x = np.linspace(XLimits[0],XLimits[1],points)
+
+
+
+
+
 
 	@property
 	def clad(self):

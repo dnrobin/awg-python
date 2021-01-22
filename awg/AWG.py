@@ -578,7 +578,7 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
 
 
     x = np.linspace(-1,1,points)*max(model.di,model.wi)
-    F = model.getInputAperture().mode(x,np.zeros(len(x)))
+    F = model.getInputAperture().mode(lmbda, x= x, ModeType = ModeType)
 
 
 

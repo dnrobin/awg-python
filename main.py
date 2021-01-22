@@ -19,7 +19,7 @@ plt.plot(y[0][0],y[1])
 plt.show()"""
 
 #for i in range()
-
+gmode(1.5,1.5,0.5,1.5,2)
 x = AWG(lambda_c = 1.5, clad = SiO2,core =Si,subs = SiO2, Ni = 10)
 F = Field([-1,0,1],[0,1,0])
 x.getInputAperture()

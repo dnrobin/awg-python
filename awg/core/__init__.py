@@ -510,7 +510,6 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 
 	return uf
 
-#print(diffract(1.5,[0,1,2,3,2,1,0],[-3,-2,-1,0,1,2,3],[-5,-4,-3,-2,-1,0,1,2,3,4,5],[1.5], method = "fresnel"))
 
 def overlap(x,u,v,hu = None,hv = None):
 	if (hu == None) and (hv == None):
@@ -529,3 +528,46 @@ def overlap(x,u,v,hu = None,hv = None):
 		vu = np.trapz(v*np.conj(hu[:]),x);
 
 		return abs(np.real(uv*vu/vv)/np.real(uu))
+
+
+def gmode(lmbda,W,H,nclad,ncore,**kwargs):
+	_in = kwargs.keys()
+
+	if "x" in _in:
+		x = kwargs["x"]
+	else:
+		x = []
+
+	if "Limits" in _in:
+		Limits = kwargs["Limits"]
+	else:
+		Limits = [-3*W,3*W]
+
+	if "points"in _in:
+		points = kwargs["points"]
+	else:
+		points = 100
+
+	if "VCoef" in _in:
+		VCoef = kwargs["VCoef"]
+	else:
+		VCoef = [0.337,0.650]
+
+	if len(x) == 0:
+		x = np.linspace(Limits[0],Limits[1], points)
+
+	V = 2*np.pi/lmbda * np.sqrt(ncore**2 - nclad**2)
+
+	w = 1/np.sqrt(W) * (VCoef[0]*W**(3/2) +VCoef[1]/V**(3/2))
+	h = 1/np.sqrt(H) * (VCoef[0]*H**(3/2) +VCoef[1]/V**(3/2))
+
+	n = (nclad +ncore)/2
+
+	E = (2/(np.pi*w**2))**(1/4)*np.exp(-x**2/w**2)
+	H = n/(120*np.pi)*(2/(np.pi*h**2))**(1/4)*np.exp(-x**2/h**2)
+
+	return E,H,x
+
+
+def wmode():
+	pass
