@@ -46,7 +46,7 @@ class Waveguide:
 			else:
 				raise ValueError("The cladding must be a material or a float representing its refractive index.")
 		else:
-			self._clad = SiO2
+			self._clad = Material(SiO2)
 
 		if "core" in _in:
 			if (type(kwargs["core"]) == types.FunctionType) or (str(type(kwargs["core"])) == "<class 'material.Material.Material'>") or (type(kwargs["core"]) == float) or (type(kwargs["core"]) == int):
@@ -56,7 +56,7 @@ class Waveguide:
 			else:
 				raise ValueError("The core must be a material or a float representing its refractive index.")
 		else:
-			self._core = Si
+			self._core = Material(Si)
 
 		if "subs" in _in:
 			if (type(kwargs["subs"]) == types.FunctionType) or (str(type(kwargs["subs"])) == "<class 'material.Material.Material'>") or (type(kwargs["subs"]) == float) or (type(kwargs["subs"]) == int):
@@ -66,7 +66,7 @@ class Waveguide:
 			else:
 				raise ValueError("The substrate must be a material or a float representing its refractive index.")
 		else:
-			self._subs = SiO2
+			self._subs = Material(SiO2)
 
 		if "w" in _in:
 			if ((type(kwargs["w"]) == int) or (type(kwargs["w"]) == float)) and (kwargs["w"] > 0):

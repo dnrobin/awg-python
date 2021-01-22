@@ -1,10 +1,8 @@
 from .core import *
 from .material import *
+from . import Field, Waveguide, Aperture
 import types
 
-class Test:
-    def __init__(self):
-        pass
 
 class AWG:
     __slots__ = [
@@ -42,7 +40,6 @@ class AWG:
     ]
     def __init__(self,**kwargs):
         _in = kwargs.keys()
-        print(_in)
 
         if "lambda_c" in _in:
             if ((type(kwargs["lambda_c"]) == float) or (type(kwargs["lambda_c"]) == int)) and (kwargs["lambda_c"] > 0):
@@ -254,6 +251,15 @@ class AWG:
             else:
                 raise ValueError("The radial defocus 'df' must be a positive float or integer")
     # Other variable to do, must make the waveguide and arrayedwaveguide classes first
+    def getSlabWaveguide(self):
+        return Waveguide.Waveguide(clad = self._clad,core = self._core,subs = self._subs,h = self._h, t = self._t)
+    
+    def getArrayWaveguide(self):
+        return Waveguide.Waveguide(clad = self._clad,core = self._core,subs = self._subs,w = self._w,h = self._h, t = self._t)
+
+    def getInputAperture(self):
+        return Aperture.Aperture(clad = self._clad,core = self._core,subs = self._subs,w = self._wi,h = self._h)
+
 
     @property
     def lambda_c(self):
@@ -534,8 +540,52 @@ class AWG:
 
 
 
-def iw():
-    pass
+def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
+
+    _in = kwargs.keys()
+
+
+    if (type(_input) == int):
+        if _input +1 > model.Ni:
+            raise ValueError(f"Undefined input number {_input} for AWG having  {model.Ni} inputs.")
+
+    offset = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
+
+    if str(type(u)) == "<class 'awg.Field.Field'>":
+        F = u
+        print(type(u))
+    elif len(u) == 0:
+        pass
+    elif (min(u.shape) > 2) or (len(u.shape) > 2) :
+        print((min(u.shape) > 2), (len(u.shape) > 2),u.shape)
+        raise ValueError("Data provided for the input field must be a two column matrix of coordinate, value pairs.")
+    else:
+        n,m = u.shape
+        F = Field.Field(u[:,0],u[:,1])
+
+    if "ModeType" in _in:
+        ModeType = kwargs["ModeType"]
+    else:
+        ModeType = "gaussian"
+
+    if ModeType not in ["rect","gaussian", "solve"]:
+        raise ValueError(f"Wrong mode type {ModeType}.")
+
+    if "points" in _in:
+        points = kwargs["points"]
+    else:
+        points = 100
+
+
+    x = np.linspace(-1,1,points)*max(model.di,model.wi)
+    F = model.getInputAperture().mode(x,np.zeros(len(x)))
+
+
+
+
+
+
+
 
 def aw():
     pass
