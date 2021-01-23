@@ -683,7 +683,7 @@ def ow(model,lmbda,F0,**kwargs):
 
         xc = model.lo +(i-(model.No-1)/2)*max(model.do,model.wo)
 
-        Fk.Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
+        Fk = Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
         Ek = Fk.Ex
 
         Ek = Ek*rect((x0-xc)/max(model.do,model.wo))

@@ -1,4 +1,5 @@
 from awg import *
+from awg.Simulate import Simulate
 from awg.core import *
 from awg.material import *
 from awg.material.Material import Material
@@ -21,6 +22,6 @@ plt.show()"""
 #for i in range()
 x = AWG(lambda_c = 1.5, clad = SiO2,core =Si,subs = SiO2, Ni = 10)
 #F = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0])
-x.getInputAperture()
-t = fpr2(x,1.5, F0 = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0],[0,1,2,3,4,3,2,1,0]))
-
+#x.getInputAperture()
+#t = fpr2(x,1.5, F0 = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0],[0,1,2,3,4,3,2,1,0]))
+Simulate(x,1.5)
