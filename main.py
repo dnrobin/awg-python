@@ -19,9 +19,8 @@ plt.plot(y[0][0],y[1])
 plt.show()"""
 
 #for i in range()
-gmode(1.5,1.5,0.5,1.5,2)
 x = AWG(lambda_c = 1.5, clad = SiO2,core =Si,subs = SiO2, Ni = 10)
-F = Field([-1,0,1],[0,1,0])
+#F = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0])
 x.getInputAperture()
-t = iw(x,1.5, _input = 5, u = np.array([[-1,0],[0,1],[1,1]]))
+t = fpr2(x,1.5, F0 = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0],[0,1,2,3,4,3,2,1,0]))
 

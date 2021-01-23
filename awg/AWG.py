@@ -2,6 +2,7 @@ from .core import *
 from .material import *
 from . import Field, Waveguide, Aperture
 import types
+from numpy.random import randn
 
 
 class AWG:
@@ -260,6 +261,12 @@ class AWG:
     def getInputAperture(self):
         return Aperture.Aperture(clad = self._clad,core = self._core,subs = self._subs,w = self._wi,h = self._h)
 
+
+    def getArrayAperture(self):
+        return Aperture.Aperture(clad = self._clad,core = self._core,subs = self._subs,w = self._wa,h = self._h)
+
+    def getOutputAperture(self):
+        return Aperture.Aperture(clad = self._clad,core = self._core,subs = self._subs,w = self._wo,h = self._h)
 
     @property
     def lambda_c(self):
@@ -553,11 +560,9 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
 
     if str(type(u)) == "<class 'awg.Field.Field'>":
         F = u
-        print(type(u))
     elif len(u) == 0:
         pass
     elif (min(u.shape) > 2) or (len(u.shape) > 2) :
-        print((min(u.shape) > 2), (len(u.shape) > 2),u.shape)
         raise ValueError("Data provided for the input field must be a two column matrix of coordinate, value pairs.")
     else:
         n,m = u.shape
@@ -580,6 +585,7 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
     x = np.linspace(-1,1,points)*max(model.di,model.wi)
     F = model.getInputAperture().mode(lmbda, x= x, ModeType = ModeType)
 
+    return F.normalize()
 
 
 
@@ -587,14 +593,189 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
 
 
 
-def aw():
-    pass
 
-def ow():
-    pass
+def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
+    _in = kwargs.keys()
 
-def fpr1():
-    pass
+    if "ModeType" in _in:
+        ModeType = kwargs["ModeType"]
+    else:
+        ModeType = "gaussian"
 
-def fpr2():
-    pass
+    if ModeType.lower() not in ["rect","gaussian", "solve"]:
+        raise ValueError(f"Wrong mode type {ModeType}.")
+
+    if "PhaseErrorVar" in _in: 
+        PhaseErrorVar = kwargs["PhaseErrorVar"]
+    else:
+        PhaseErrorVar = 0
+
+    if "InsertionLoss" in _in:
+        InsertionLoss = kwargs["InsertionLoss"] # Insertion Loss in dB
+    else:
+        InsertionLoss = 0
+
+    if "PropagationLoss" in _in:
+        PropagationLoss = kwargs["PropagationLoss"]
+    else:
+        PropagationLoss = 0
+
+    x0 = list_to_array(F0.x)
+    u0 = F0.Ex
+    P0 = F0.power()
+
+    k0 = 2*np.pi/lmbda
+    nc = model.getArrayWaveguide().index(lmbda,1)[0]
+
+    dr = model.R * (1/np.cos(x0/model.R)-1)
+    dp0 = 2*k0*nc*dr
+    u0 = u0*np.exp(-1j*dp0)
+
+
+    pnoise = randn(1,model.N)[0]*np.sqrt(PhaseErrorVar)
+    iloss = 10**(-abs(InsertionLoss)/10)
+    Aperture = model.getArrayAperture()
+
+    Ex = np.zeros(len(F0.E))
+
+    for i in range(model.N):
+        xc = (i - (model.N-1)/2)*model.d
+
+        Fk =  Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType).normalize()
+
+        Ek = Fk.Ex *rect((x0-xc)/model.d)
+        Ek = pnorm(Fk.x,Ek)
+        t = overlap(x0,u0,Ek)
+
+        L = i*model.dl + model.L0
+        phase = k0*nc*L+pnoise[i]
+
+
+        ploss = 10**(-abs(PropagationLoss*L*1e-4)/10)
+
+        t = t*ploss*iloss**2
+        Efield = P0*t*Ek*np.exp(-1j*phase)
+
+        Ex = Ex+Efield
+
+    return Field.Field(x0,Ex)
+
+
+def ow(model,lmbda,F0,**kwargs):
+
+    if "ModeType" in kwargs.keys():
+        ModeType = kwargs["ModeType"]
+    else:
+        ModeType = "gaussian"
+
+    if ModeType.lower() not in ["rect","gaussian", "solve"]:
+        raise ValueError(f"Wrong mode type {ModeType}.")
+
+    x0 = F0.x
+    u0 = F0.Ex
+    P0 = F0.power()
+
+    Aperture = model.getOutputAperture()
+
+    T = np.zeros(model.No)
+
+    for i in range(model.No):
+
+        xc = model.lo +(i-(model.No-1)/2)*max(model.do,model.wo)
+
+        Fk.Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
+        Ek = Fk.Ex
+
+        Ek = Ek*rect((x0-xc)/max(model.do,model.wo))
+
+        T[i] = P0*overlap(x0,u0,Ek)
+    return T
+
+def fpr1(model,lmbda,F0,**kwargs):
+    _in =kwargs.keys()
+
+    if "x" in _in:
+        x = kwargs["x"]
+    else:
+        x = []
+
+    if "Input" in _in:
+        _input = kwargs["Input"]
+    else:
+        _input = 0
+
+    if "points" in _in:
+        points = kwargs["points"]
+    else:
+        points = 250
+
+    xi = F0.x
+    ui = F0.Ex
+
+    ns = model.getSlabWaveguide().index(lmbda,1)[0]
+
+    if len(x) == 0:
+        sf = np.linspace(-1/2,1/2,points)*(model.N+4)*model.d
+    else:
+        sf = x
+
+    R = model.R
+    r = model.R/2
+    if model.confocal:
+        r = model.R
+
+
+    s0 = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
+    t0 = s0/r
+    x0 = r*np.sin(t0)
+    z0 = r*(1-np.cos(t0))
+
+    t = sf/R
+    x = R*np.sin(t)
+    z = R*np.cos(t)
+
+    a0 = np.arctan(np.sin(t0)/(1+np.cos(t0)))
+    xf = (x+x0)*np.cos(a0)+(z+z0)*np.sin(a0)
+    zf = -(x+x0)*np.sin(a0)+(z+z0)*np.cos(a0)
+
+    uf = diffract(lmbda/ns,ui,xi,xf,zf)
+
+    return Field.Field(sf,uf).normalize(F0.power())
+
+
+def fpr2(model,lmbda,F0,**kwargs):
+    _in  = kwargs.keys()
+    
+    if "x" in _in:
+        x = kwargs["x"]
+    else:
+        x = []
+
+    if "points" in _in:
+        points = kwargs["points"]
+    else:
+        points = 250
+
+    xi = F0.x
+    ui = F0.Ex
+
+    ns = model.getSlabWaveguide().index(lmbda,1)[0]
+    nc = model.getArrayWaveguide().index(lmbda,1)[0]
+
+    R = model.R
+    r = R/2
+    if model.confocal:
+        r = R
+
+    if len(x) == 0:
+        sf = np.linspace(-1/2,1/2,points)*(model.No+4)*max(model.do,model.wo)
+    else:
+        sf = x
+
+    uf = 0
+
+    xf = r*np.sin(sf/r)
+    zf = r*(1+np.cos(sf/r))
+    uf = diffract(lmbda/ns,ui,xi,xf,zf)
+
+    return Field.Field(sf,uf).normalize(F0.power())

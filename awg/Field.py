@@ -91,9 +91,9 @@ class Field:
 					DataFormat(self._Ey,sz),
 					DataFormat(self._Ez,sz))
 
-		self._Ex = self.Edata[0]
-		self._Ey = self.Edata[1]
-		self._Ez = self.Edata[2]
+		self._Ex = list_to_array(self.Edata[0])
+		self._Ey = list_to_array(self.Edata[1])
+		self._Ez = list_to_array(self.Edata[2])
 
 
 
@@ -120,16 +120,18 @@ class Field:
 					DataFormat(self._Hz,sz))
 
 
-		self._Hx = self.Hdata[0]
-		self._Hy = self.Hdata[1]
-		self._Hz = self.Hdata[2]
+		self._Hx = list_to_array(self.Hdata[0])
+		self._Hy = list_to_array(self.Hdata[1])
+		self._Hz = list_to_array(self.Hdata[2])
 
 		
 
 	def poynting(self):
-		if self.HasMagnetic() :
+
+		if self.hasMagnetic() :
 			return  self._Ex*np.conjugate(self._Hy) - self._Ey*np.conjugate(self._Hx)
 		else:
+
 			return self._Ex*np.conj(self._Ex)
 
 	def power(self):
@@ -137,13 +139,13 @@ class Field:
 			return np.trapz(np.trapz(self._y, self.poynting()),self._x)
 		else:
 			if self.dimens == 1:
-
 				return np.trapz(self.poynting(),self._x)
 			else:
 				return np.trapz(self.poynting(),self._y)
 
 	def normalize(self,P = 1):
 		P0 = abs(self.power())
+
 		for i in range(len(self.Edata)):
 			for j in range(len(self.Edata[0])):
 				self.Edata[i][j] = self.Edata[i][j]*(P/P0)**0.5
@@ -159,7 +161,7 @@ class Field:
 			return False
 
 	def hasMagnetic(self):
-		if np.any([self.Hdata]):
+		if np.any(self.Hdata):
 			return True
 		else:
 			return False
@@ -201,6 +203,9 @@ class Field:
 		if len(self.Xdata[0]) != 0:
 			self.Xdata[1] = [i+dy for i in self.Xdata[1]]
 		return self
+
+	def __str__(self):
+		return f"{self._Hx},\n \n{self._Ex} \n \n{self.normalize()._Ex}"
 
 	@property
 	def x(self):

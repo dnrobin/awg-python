@@ -2,6 +2,7 @@ from .core import *
 from .material import *
 from .material.Material import Material
 from .material import dispersion
+from . import Field
 import types
 
 class Waveguide:
@@ -114,7 +115,7 @@ class Waveguide:
 
 		return dispersion.dispersion(self.groupindex,lmbda1,lmbda2,point = point)
 
-	def mode(self,lmbda,**kwargs):
+	def mode(self,lmbda,**kwargs): ### Generate a Field completly independant of the implanted Field
 		
 		_in = kwargs.keys()
 		
@@ -145,6 +146,22 @@ class Waveguide:
 		if len(x) == 0:
 			x = np.linspace(XLimits[0],XLimits[1],points)
 
+		if ModeType == "rect":
+			n = (n1+n2)/2
+			n0 = 120*np.pi
+			E = 1/(self._w**(1/4))*rect(x/self._w)
+			H = n/n0 * 1/(self._w**(1/4))*rect(x/self._w)
+
+		elif ModeType == "gaussian":
+			E,H,_ = gmode(lmbda, self._w, self._h, n2, n1, x = x)
+
+		elif ModeType == "solve":
+			E,H, _, _ = wgmode(lmbda,self._w,self._h,self._t,n2.n1,n3,x = x)
+
+		else:
+			raise ValueError("Unknow mode type")
+
+		return Field.Field(x,E,H)
 
 
 

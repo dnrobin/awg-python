@@ -20,6 +20,45 @@ def step(x): # take only list or arrays
 def rect(x):
 	return step(-x+1/2)*step(x+1/2)
 ### length of float and integer are not defined ###
+
+def sinc(x):
+	return min(1,np.sin(x)/(x*np.pi))
+
+def fpower(x,Ex,Hy = [],Ey = [],Hx = []):
+	if (len(Ey) != 0) and (len(Hx) != 0):
+		Sz = 1/2 * np.real(Ex*np.conj(Hy)-Ey*np.conj(Hx))
+		P = np.trapz(Sz,x)
+	elif len(Hy) != 0:
+		Sz = np.real(Ex*np.conj(Hy))
+		P = np.trapz(Sz,x)
+	else:
+		P = np.trapz(np.abs(Ex)**2,x)
+	return P
+
+def pnorm(x,Ex,Hy = [],Ey = [],Hx = []):
+	if (len(Ey) != 0) and (len(Hx) != 0):
+
+		P = fpower(x,Ex,Hy,Ey,Hx)
+		Exnorm = Ex/np.sqrt(P)
+		Hynorm = Hy/np.sqrt(P)
+		Eynorm = Ey/np.sqrt(P)
+		Hxnorm = Hx/np.sqrt(P)
+		return Exnorm,Hynorm,Eynorm,Hxnorm
+
+	elif len(Hy) != 0:
+
+		P = fpower(x,Ex,Hy)
+		Exnorm = Ex/np.sqrt(P)
+		Hynorm = Hy/np.sqrt(P)
+		return Exnorm,Hynorm
+
+	else:
+
+		P = fpower(x,Ex)
+		Exnorm = Ex/np.sqrt(P)
+		return Exnorm
+
+
 def mat_prod(a, ma1,ma2):
 	for i in range(len(a)):
 		for j in range(len(a[i])):
@@ -564,10 +603,6 @@ def gmode(lmbda,W,H,nclad,ncore,**kwargs):
 	n = (nclad +ncore)/2
 
 	E = (2/(np.pi*w**2))**(1/4)*np.exp(-x**2/w**2)
-	H = n/(120*np.pi)*(2/(np.pi*h**2))**(1/4)*np.exp(-x**2/h**2)
+	H = n/(120*np.pi)*(2/(np.pi*h**2))**(1/4)*np.exp(-x**2/h**2) # Possibly generate a weak magnetic field while wanting it to be 0
 
 	return E,H,x
-
-
-def wmode():
-	pass
