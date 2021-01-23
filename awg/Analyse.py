@@ -3,6 +3,9 @@ import numpy as np
 
 
 def Analyse(AWG):
+	
+	lmbda = AWG.lambda_c
+
 	TdB = 10*np.log10(T)
 	num_channels = np.shape(T)[1]
 	center_channel = int(np.floor(num_channels/2))
