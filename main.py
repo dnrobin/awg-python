@@ -1,10 +1,8 @@
 from awg import *
-from awg.Simulate import Simulate
+#from awg.Simulate import Simulate
 from awg.core import *
-from awg.material import *
-from awg.material.Material import Material
+
 import matplotlib.pyplot as plt
-import time
 # Here we test the framework for now
 """y = Material(Si3N4)
 
@@ -20,8 +18,12 @@ plt.plot(y[0][0],y[1])
 plt.show()"""
 
 #for i in range()
-x = AWG(lambda_c = 1.5, clad = SiO2,core =Si,subs = SiO2, Ni = 10)
-#F = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0])
+x = AWG()
+F = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0])
 #x.getInputAperture()
-#t = fpr2(x,1.5, F0 = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0],[0,1,2,3,4,3,2,1,0]))
-Simulate(x,1.5)
+t = iw(x,1.5, F0 = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0],[0,1,2,3,4,3,2,1,0]))
+#Simulate(x,1.5, Options = SimulationOptions(ModeType = "solve"))
+
+#E,H,y = gmode(1.5,x.w,x.h,SiO2(1.5),Si(1.5))
+#F = Field(y,E,([],H))
+#print(F.poynting())

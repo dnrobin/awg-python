@@ -555,7 +555,6 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
     if (type(_input) == int):
         if _input +1 > model.Ni:
             raise ValueError(f"Undefined input number {_input} for AWG having  {model.Ni} inputs.")
-
     offset = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
 
     if str(type(u)) == "<class 'awg.Field.Field'>":
@@ -586,11 +585,6 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
     F = model.getInputAperture().mode(lmbda, x= x, ModeType = ModeType)
 
     return F.normalize()
-
-
-
-
-
 
 
 

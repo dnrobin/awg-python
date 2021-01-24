@@ -127,7 +127,6 @@ class Field:
 		
 
 	def poynting(self):
-
 		if self.hasMagnetic() :
 			return  self._Ex*np.conjugate(self._Hy) - self._Ey*np.conjugate(self._Hx)
 		else:
@@ -161,7 +160,7 @@ class Field:
 			return False
 
 	def hasMagnetic(self):
-		if np.any(self.Hdata):
+		if max([np.any(i) for i in self.Hdata]):
 			return True
 		else:
 			return False

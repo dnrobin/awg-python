@@ -17,6 +17,9 @@ from .Field import Field
 from .Aperture import Aperture
 from .Waveguide import Waveguide
 from .SimulationOptions import SimulationOptions
+from .Simulate import Simulate
+from .material import *
+from .material.Material import Material
 
 from .material import (
     Material,

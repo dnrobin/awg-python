@@ -603,6 +603,9 @@ def gmode(lmbda,W,H,nclad,ncore,**kwargs):
 	n = (nclad +ncore)/2
 
 	E = (2/(np.pi*w**2))**(1/4)*np.exp(-x**2/w**2)
-	H = n/(120*np.pi)*(2/(np.pi*h**2))**(1/4)*np.exp(-x**2/h**2) # Possibly generate a weak magnetic field while wanting it to be 0
+	H = n/(120*np.pi)*(2/(np.pi*h**2))**(1/4)*np.exp(-x**2/h**2)
 
 	return E,H,x
+
+
+

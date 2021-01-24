@@ -156,12 +156,12 @@ class Waveguide:
 			E,H,_ = gmode(lmbda, self._w, self._h, n2, n1, x = x)
 
 		elif ModeType == "solve":
-			E,H, _, _ = wgmode(lmbda,self._w,self._h,self._t,n2.n1,n3,x = x)
+			E,H, _, _ = wgmode(lmbda,self._w,self._h,self._t,n2,n1,n3,x = x)
 
 		else:
 			raise ValueError("Unknow mode type")
 
-		return Field.Field(x,E,H)
+		return Field.Field(x,E,([],H))
 
 
 

@@ -1,10 +1,11 @@
 from tabulate import tabulate
 import numpy as np
+from .Simulate import Simulate
 
-
-def Analyse(AWG):
+def Analyse(results):
 	
-	lmbda = AWG.lambda_c
+	lmbda = results.lmbda
+	T = results.transmission
 
 	TdB = 10*np.log10(T)
 	num_channels = np.shape(T)[1]
