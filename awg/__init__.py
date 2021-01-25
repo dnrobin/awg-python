@@ -18,6 +18,8 @@ from .Aperture import Aperture
 from .Waveguide import Waveguide
 from .SimulationOptions import SimulationOptions
 from .Simulate import Simulate
+from .Spectrum import Spectrum
+from .Analyse import  Analyse
 from .material import *
 from .material.Material import Material
 

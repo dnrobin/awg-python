@@ -531,14 +531,15 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 		xf = list_to_array(xf)
 
 	k = 2*np.pi/lmbda0
-
 	uf = np.zeros(len(xf),dtype = complex)
 
 	for i in range(len(xf)):
+
 		r = np.sqrt((xf[i]-xi)**2+zf[i]**2)
 		if method == "rayleigh":
 
 			uf[i] = np.sqrt(k/(2j*np.pi))*np.trapz(ui*zf[i]/r**(3/2)*np.exp(-1j*k*r),xi)
+		
 
 		elif method == "fresnel":
 
@@ -546,15 +547,15 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 		
 		else:
 			raise ValueError(f"Unrecognized {method} method.")
-
 	return uf
 
 
 def overlap(x,u,v,hu = None,hv = None):
 	if (hu == None) and (hv == None):
-		uu = np.trapz((np.conj(u[:])*u[:]),x) 
-		vv = np.trapz((np.conj(v[:])*v[:]),x) 
-		uv = np.trapz((np.conj(u[:])*v[:]),x) 
+		uu = np.trapz(np.conj(u)*u,x)
+		print(u) 
+		vv = np.trapz(np.conj(v)*v,x) 
+		uv = np.trapz(np.conj(u)*v,x) 
 		return abs(uv)**2/(np.sqrt(uu)*np.sqrt(vv))
 	else:
 		if hu == None:
@@ -597,10 +598,10 @@ def gmode(lmbda,W,H,nclad,ncore,**kwargs):
 
 	V = 2*np.pi/lmbda * np.sqrt(ncore**2 - nclad**2)
 
-	w = 1/np.sqrt(W) * (VCoef[0]*W**(3/2) +VCoef[1]/V**(3/2))
-	h = 1/np.sqrt(H) * (VCoef[0]*H**(3/2) +VCoef[1]/V**(3/2))
+	w = 1/np.sqrt(W) * (VCoef[0]*W**(3/2) + VCoef[1]/V**(3/2))
+	h = 1/np.sqrt(H) * (VCoef[0]*H**(3/2) + VCoef[1]/V**(3/2))
 
-	n = (nclad +ncore)/2
+	n = (nclad + ncore)/2
 
 	E = (2/(np.pi*w**2))**(1/4)*np.exp(-x**2/w**2)
 	H = n/(120*np.pi)*(2/(np.pi*h**2))**(1/4)*np.exp(-x**2/h**2)

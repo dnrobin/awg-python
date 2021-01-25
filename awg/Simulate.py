@@ -16,19 +16,21 @@ class Simulate:
 			Options = SimulationOptions()
 
 		if len(Options.CustomInputField) != 0:
-			F_iw = AWG.iw(model,lmbda,_input,Options.CustomInputField)
+			F_iw = iw(model,lmbda,_input,Options.CustomInputField)
 		else:
 			F_iw = iw(model,lmbda,_input, ModeType = Options.ModeType, points = points)
 
 		F_fpr1 = fpr1(model,lmbda,F_iw,points= points)
 
-		F_aw = aw(model,lmbda,F_fpr1,ModeType = Options.ModeType,
+		F_aw = aw(model,lmbda,F_fpr1, ModeType = Options.ModeType,
 				PhaseErrorVar = Options.PhaseErrorVariance, InsertionLoss = Options.InsertionLoss,
 				PropagationLoss = Options.PropagationLoss)
 
 		F_fpr2 = fpr2(model,lmbda,F_aw, points = points)
 
 		F_ow = ow(model,lmbda,F_fpr2, ModeType = Options.ModeType)
+
+		#print(F_iw.Ex,F_fpr1.Ex,F_aw.Ex,F_fpr2.Ex,F_ow, sep = "\n\n\n")
 
 		self.transmission = F_ow
 		self.inputField = F_iw

@@ -3,27 +3,22 @@ from awg import *
 from awg.core import *
 
 import matplotlib.pyplot as plt
-# Here we test the framework for now
-"""y = Material(Si3N4)
 
 
-z = y.dispersion(1.3,1.8)
-x = Waveguide(core = Si3N4,subs = SiO2, clad = SiO2,w = 1)
-#print(type(x), type(y))
-y = x.dispersion(1.3,1.8, point = 500)
+F = Field(list_to_array([-2,-1,0,1,2]),list_to_array([0,1,2,1,0])).normalize()
 
-print(y)
 
-plt.plot(y[0][0],y[1])
-plt.show()"""
+model = AWG(clad = SiO2, core = Si, subs = SiO2, lambda_c = 1.550,
+			Ni = 1, No = 9, w = 0.450, h = 0.220, N = 40, m = 75, R = 130,
+			d = 2.5, g = 0.4, do = 1.8, wi = 1.5, wo = 1.5, L0 = 20)
 
-#for i in range()
-x = AWG()
-F = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0])
-#x.getInputAperture()
-t = iw(x,1.5, F0 = Field([-4,-3,-2,-1,0,1,2,3,4],[0,1,2,3,4,3,2,1,0],[0,1,2,3,4,3,2,1,0]))
-#Simulate(x,1.5, Options = SimulationOptions(ModeType = "solve"))
+options = SimulationOptions()
+options.PhaseErrorVariance = 0
+options.ModeType = "gaussian"
 
-#E,H,y = gmode(1.5,x.w,x.h,SiO2(1.5),Si(1.5))
-#F = Field(y,E,([],H))
-#print(F.poynting())
+#aw(model,1.550,F)
+Simulate(model,model.lambda_c,Options = options)
+
+#results = Spectrum(model,1.55,0.01, Options = options, Samples = 100)
+
+#measurements = Analyse(results)

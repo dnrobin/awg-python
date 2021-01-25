@@ -154,6 +154,7 @@ class Waveguide:
 
 		elif ModeType == "gaussian":
 			E,H,_ = gmode(lmbda, self._w, self._h, n2, n1, x = x)
+			#print(E)
 
 		elif ModeType == "solve":
 			E,H, _, _ = wgmode(lmbda,self._w,self._h,self._t,n2,n1,n3,x = x)

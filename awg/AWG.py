@@ -235,7 +235,7 @@ class AWG:
             else:
                 raise ValueError("The waveguide aperture width 'wa' [um] must be a positive float or integer")
         else:
-            self._wa = 1 # Check what default value is
+            self._wa = self._d - self._g
 
 
         if "dl" in _in:
@@ -253,7 +253,7 @@ class AWG:
                 raise ValueError("The radial defocus 'df' must be a positive float or integer")
     # Other variable to do, must make the waveguide and arrayedwaveguide classes first
     def getSlabWaveguide(self):
-        return Waveguide.Waveguide(clad = self._clad,core = self._core,subs = self._subs,h = self._h, t = self._t)
+        return Waveguide.Waveguide(clad = self._clad,core = self._core,subs = self._subs,h = self._h, t = self._h)
     
     def getArrayWaveguide(self):
         return Waveguide.Waveguide(clad = self._clad,core = self._core,subs = self._subs,w = self._w,h = self._h, t = self._t)
@@ -460,7 +460,7 @@ class AWG:
         return self._No
 
     @No.setter
-    def No(self,Ni):
+    def No(self,No):
         if (type(No) == int) and (No > 0):
             self._No = No 
         else:
@@ -555,7 +555,6 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
     if (type(_input) == int):
         if _input +1 > model.Ni:
             raise ValueError(f"Undefined input number {_input} for AWG having  {model.Ni} inputs.")
-    offset = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
 
     if str(type(u)) == "<class 'awg.Field.Field'>":
         F = u
@@ -585,105 +584,6 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
     F = model.getInputAperture().mode(lmbda, x= x, ModeType = ModeType)
 
     return F.normalize()
-
-
-
-def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
-    _in = kwargs.keys()
-
-    if "ModeType" in _in:
-        ModeType = kwargs["ModeType"]
-    else:
-        ModeType = "gaussian"
-
-    if ModeType.lower() not in ["rect","gaussian", "solve"]:
-        raise ValueError(f"Wrong mode type {ModeType}.")
-
-    if "PhaseErrorVar" in _in: 
-        PhaseErrorVar = kwargs["PhaseErrorVar"]
-    else:
-        PhaseErrorVar = 0
-
-    if "InsertionLoss" in _in:
-        InsertionLoss = kwargs["InsertionLoss"] # Insertion Loss in dB
-    else:
-        InsertionLoss = 0
-
-    if "PropagationLoss" in _in:
-        PropagationLoss = kwargs["PropagationLoss"]
-    else:
-        PropagationLoss = 0
-
-    x0 = list_to_array(F0.x)
-    u0 = F0.Ex
-    P0 = F0.power()
-
-    k0 = 2*np.pi/lmbda
-    nc = model.getArrayWaveguide().index(lmbda,1)[0]
-
-    dr = model.R * (1/np.cos(x0/model.R)-1)
-    dp0 = 2*k0*nc*dr
-    u0 = u0*np.exp(-1j*dp0)
-
-
-    pnoise = randn(1,model.N)[0]*np.sqrt(PhaseErrorVar)
-    iloss = 10**(-abs(InsertionLoss)/10)
-    Aperture = model.getArrayAperture()
-
-    Ex = np.zeros(len(F0.E))
-
-    for i in range(model.N):
-        xc = (i - (model.N-1)/2)*model.d
-
-        Fk =  Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType).normalize()
-
-        Ek = Fk.Ex *rect((x0-xc)/model.d)
-        Ek = pnorm(Fk.x,Ek)
-        t = overlap(x0,u0,Ek)
-
-        L = i*model.dl + model.L0
-        phase = k0*nc*L+pnoise[i]
-
-
-        ploss = 10**(-abs(PropagationLoss*L*1e-4)/10)
-
-        t = t*ploss*iloss**2
-        Efield = P0*t*Ek*np.exp(-1j*phase)
-
-        Ex = Ex+Efield
-
-    return Field.Field(x0,Ex)
-
-
-def ow(model,lmbda,F0,**kwargs):
-
-    if "ModeType" in kwargs.keys():
-        ModeType = kwargs["ModeType"]
-    else:
-        ModeType = "gaussian"
-
-    if ModeType.lower() not in ["rect","gaussian", "solve"]:
-        raise ValueError(f"Wrong mode type {ModeType}.")
-
-    x0 = F0.x
-    u0 = F0.Ex
-    P0 = F0.power()
-
-    Aperture = model.getOutputAperture()
-
-    T = np.zeros(model.No)
-
-    for i in range(model.No):
-
-        xc = model.lo +(i-(model.No-1)/2)*max(model.do,model.wo)
-
-        Fk = Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
-        Ek = Fk.Ex
-
-        Ek = Ek*rect((x0-xc)/max(model.do,model.wo))
-
-        T[i] = P0*overlap(x0,u0,Ek)
-    return T
 
 def fpr1(model,lmbda,F0,**kwargs):
     _in =kwargs.keys()
@@ -723,11 +623,11 @@ def fpr1(model,lmbda,F0,**kwargs):
     t0 = s0/r
     x0 = r*np.sin(t0)
     z0 = r*(1-np.cos(t0))
-
+    #print(s0,t0,x0,z0,R,r,sep = "\n")
     t = sf/R
     x = R*np.sin(t)
     z = R*np.cos(t)
-
+    #print(t,x,z,sep = "\n")
     a0 = np.arctan(np.sin(t0)/(1+np.cos(t0)))
     xf = (x+x0)*np.cos(a0)+(z+z0)*np.sin(a0)
     zf = -(x+x0)*np.sin(a0)+(z+z0)*np.cos(a0)
@@ -735,6 +635,107 @@ def fpr1(model,lmbda,F0,**kwargs):
     uf = diffract(lmbda/ns,ui,xi,xf,zf)
 
     return Field.Field(sf,uf).normalize(F0.power())
+
+def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
+    _in = kwargs.keys()
+
+    if "ModeType" in _in:
+        ModeType = kwargs["ModeType"]
+    else:
+        ModeType = "gaussian"
+
+    if ModeType.lower() not in ["rect","gaussian", "solve"]:
+        raise ValueError(f"Wrong mode type {ModeType}.")
+
+    if "PhaseErrorVar" in _in: 
+        PhaseErrorVar = kwargs["PhaseErrorVar"]
+    else:
+        PhaseErrorVar = 0
+
+    if "InsertionLoss" in _in:
+        InsertionLoss = kwargs["InsertionLoss"] # Insertion Loss in dB
+    else:
+        InsertionLoss = 0
+
+    if "PropagationLoss" in _in:
+        PropagationLoss = kwargs["PropagationLoss"]
+    else:
+        PropagationLoss = 0
+
+    x0 = F0.x
+    u0 = F0.Ex
+    P0 = F0.power()
+    #print(u0)
+    k0 = 2*np.pi/lmbda
+    nc = model.getArrayWaveguide().index(lmbda,1)[0]
+
+    dr = model.R * (1/np.cos(x0/model.R)-1)
+    dp0 = 2*k0*nc*dr
+    u0 = u0*np.exp(-1j*dp0)
+
+    pnoise = randn(1,model.N)[0]*np.sqrt(PhaseErrorVar)
+    iloss = 10**(-abs(InsertionLoss)/10)
+    
+    Aperture = model.getArrayAperture()
+
+    Ex = np.zeros(len(F0.E))
+
+    for i in range(model.N):
+        xc = (i - (model.N-1)/2)*model.d
+
+        Fk =  Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)#.normalize()
+
+        Ek = Fk.Ex *rect((x0-xc)/model.d)
+
+        Ek = pnorm(Fk.x,Ek)
+
+        t = overlap(x0,u0,Ek)
+        #print(t)
+        L = i*model.dl + model.L0
+        phase = k0*nc*L+pnoise[i]
+
+
+        ploss = 10**(-abs(PropagationLoss*L*1e-4)/10)
+
+        t = t*ploss*iloss**2
+        Efield = P0*t*Ek*np.exp(-1j*phase)
+
+        Ex = Ex + Efield
+    #print(Ex)
+    return Field.Field(x0,Ex)
+
+
+def ow(model,lmbda,F0,**kwargs):
+
+    if "ModeType" in kwargs.keys():
+        ModeType = kwargs["ModeType"]
+    else:
+        ModeType = "gaussian"
+
+    if ModeType.lower() not in ["rect","gaussian", "solve"]:
+        raise ValueError(f"Wrong mode type {ModeType}.")
+
+    x0 = F0.x
+    u0 = F0.Ex
+    P0 = F0.power()
+
+    Aperture = model.getOutputAperture()
+
+    T = np.zeros(model.No)
+
+    for i in range(model.No):
+
+        xc = model.lo +(i-(model.No-1)/2)*max(model.do,model.wo)
+
+        Fk = Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
+        Ek = Fk.Ex
+
+        Ek = Ek*rect((x0-xc)/max(model.do,model.wo))
+
+        T[i] = P0*overlap(x0,u0,Ek)
+    return T
+
+
 
 
 def fpr2(model,lmbda,F0,**kwargs):
