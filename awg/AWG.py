@@ -1,16 +1,19 @@
 from .core import *
 from .material import *
+from .material.Material import Material
 from . import Field, Waveguide, Aperture
 import types
 from numpy.random import randn
-
 
 class AWG:
     __slots__ = [
         '_lambda_c',  # center wavelength
         '_clad',      # clad material or index of the waveguide
+        'nclad',
         '_core',      # core material or index of the waveguide
+        'ncore',
         '_subs',      # substrate material or index of the waveguide
+        'nsubs',
         '_w',         # waveguide core width
         '_h',         # waveguide core height
         '_t',         # waveguide slab thickness (for rib waveguides) (def. 0)
@@ -51,20 +54,30 @@ class AWG:
             self._lambda_c = 1.550
 
         if "clad" in _in:
-            if (type(kwargs["clad"]) == types.FunctionType) or (str(type(kwargs["clad"])) == "<class 'material.Material.Material'>") or (type(kwargs["clad"]) == float) or (type(kwargs["clad"]) == int):
+            if (type(kwargs["clad"]) == types.FunctionType) or (type(kwargs["clad"]) == float) or (type(kwargs["clad"]) == int):
+                self._clad = Material(kwargs["clad"])
+            elif (str(type(kwargs["clad"])) == "<class 'awg.material.Material.Material'>"):
                 self._clad = kwargs["clad"]
+            elif type(kwargs["clad"]) == list:
+                self._clad = Material(list_to_array(kwargs["clad"]))
             else:
                 raise ValueError("The cladding must be a material or a float representing its refractive index.")
         else:
-            self._clad = SiO2
+            self._clad = Material(SiO2)
+        self.nclad = self.clad.index(self.lambda_c)
 
         if "core" in _in:
-            if (type(kwargs["core"]) == types.FunctionType) or (str(type(kwargs["core"])) == "<class 'material.Material.Material'>") or (type(kwargs["core"]) == float) or (type(kwargs["core"]) == int):
+            if (type(kwargs["core"]) == types.FunctionType) or (type(kwargs["core"]) == float) or (type(kwargs["core"]) == int):
+                self._core = Material(kwargs["core"])
+            elif (str(type(kwargs["core"])) == "<class 'awg.material.Material.Material'>"):
                 self._core = kwargs["core"]
+            elif type(kwargs["core"]) == list:
+                self._core = Material(list_to_array(kwargs["core"]))
             else:
                 raise ValueError("The core must be a material or a float representing its refractive index.")
         else:
-            self._core = Si
+            self._core = Material(Si)
+        self.ncore = self.core.index(self.lambda_c)
 
         if "nc" in _in:
             if ((type(kwargs["nc"]) == int) or (type(kwargs["nc"]) == float)) and (kwargs["nc"] > 0):
@@ -78,12 +91,17 @@ class AWG:
                 self._nc = self._core
 
         if "subs" in _in:
-            if (type(kwargs["subs"]) == types.FunctionType) or (str(type(kwargs["subs"])) == "<class 'material.Material.Material'>") or (type(kwargs["subs"]) == float) or (type(kwargs["subs"]) == int):
+            if (type(kwargs["subs"]) == types.FunctionType) or (type(kwargs["subs"]) == float) or (type(kwargs["subs"]) == int):
+                self._subs = Material(kwargs["subs"])
+            elif (str(type(kwargs["subs"])) == "<class 'awg.material.Material.Material'>"):
                 self._subs = kwargs["subs"]
+            elif type(kwargs["subs"]) == list:
+                self._subs = Material(list_to_array(kwargs["subs"]))
             else:
                 raise ValueError("The substrate must be a material or a float representing its refractive index.")
         else:
-            self._subs = SiO2
+            self._subs = Material(SiO2)
+        self.nsubs = self.subs.index(self.lambda_c)
 
         if "w" in _in:
             if ((type(kwargs["w"]) == int) or (type(kwargs["w"]) == float)) and (kwargs["w"] > 0):
@@ -237,6 +255,8 @@ class AWG:
         else:
             self._wa = self._d - self._g
 
+        wg = self.getArrayWaveguide()
+        self._nc = wg.index(self.lambda_c,1)[0]
 
         if "dl" in _in:
             if ((type(kwargs["dl"]) == int) or (type(kwargs["dl"]) == float)) and (kwargs["dl"] > 0):
@@ -300,6 +320,11 @@ class AWG:
             self._core = core
         else:
             raise ValueError("The core must be a material or a float representing its refractive index.")
+
+    @property
+    def nc(self):
+        return self._nc
+    
 
     @property
     def subs(self):
@@ -690,52 +715,20 @@ def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
         Ek = pnorm(Fk.x,Ek)
 
         t = overlap(x0,u0,Ek)
-        #print(t)
+
         L = i*model.dl + model.L0
         phase = k0*nc*L+pnoise[i]
 
-
         ploss = 10**(-abs(PropagationLoss*L*1e-4)/10)
-
         t = t*ploss*iloss**2
+
+
+
         Efield = P0*t*Ek*np.exp(-1j*phase)
 
         Ex = Ex + Efield
-    #print(Ex)
+
     return Field.Field(x0,Ex)
-
-
-def ow(model,lmbda,F0,**kwargs):
-
-    if "ModeType" in kwargs.keys():
-        ModeType = kwargs["ModeType"]
-    else:
-        ModeType = "gaussian"
-
-    if ModeType.lower() not in ["rect","gaussian", "solve"]:
-        raise ValueError(f"Wrong mode type {ModeType}.")
-
-    x0 = F0.x
-    u0 = F0.Ex
-    P0 = F0.power()
-
-    Aperture = model.getOutputAperture()
-
-    T = np.zeros(model.No)
-
-    for i in range(model.No):
-
-        xc = model.lo +(i-(model.No-1)/2)*max(model.do,model.wo)
-
-        Fk = Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
-        Ek = Fk.Ex
-
-        Ek = Ek*rect((x0-xc)/max(model.do,model.wo))
-
-        T[i] = P0*overlap(x0,u0,Ek)
-    return T
-
-
 
 
 def fpr2(model,lmbda,F0,**kwargs):
@@ -774,3 +767,34 @@ def fpr2(model,lmbda,F0,**kwargs):
     uf = diffract(lmbda/ns,ui,xi,xf,zf)
 
     return Field.Field(sf,uf).normalize(F0.power())
+
+
+def ow(model,lmbda,F0,**kwargs):
+
+    if "ModeType" in kwargs.keys():
+        ModeType = kwargs["ModeType"]
+    else:
+        ModeType = "gaussian"
+
+    if ModeType.lower() not in ["rect","gaussian", "solve"]:
+        raise ValueError(f"Wrong mode type {ModeType}.")
+
+    x0 = F0.x
+    u0 = F0.Ex
+    P0 = F0.power()
+
+    Aperture = model.getOutputAperture()
+
+    T = np.zeros(model.No)
+
+    for i in range(model.No):
+
+        xc = model.lo +(i-(model.No-1)/2)*max(model.do,model.wo)
+
+        Fk = Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)
+        Ek = Fk.Ex
+
+        Ek = Ek*rect((x0-xc)/max(model.do,model.wo))
+
+        T[i] = P0*overlap(x0,u0,Ek)**2
+    return T

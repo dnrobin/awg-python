@@ -2,7 +2,6 @@
 awg.material is a package for modeling material chromatic dispersion.
 """
 import types
-#from .Material import * 
 from . import *
 from . import dispersion
 
@@ -10,12 +9,12 @@ from . import dispersion
 class Material:
 	def __init__(self, model):
 	
-		if (str(type(model)) == "<class 'awg.material.Material'>"):
+		if (str(type(model)) == "<class 'awg.material.Material.Material'>"):
 			self.type = model.type
-			#self.model = model.model
+			self.model = model.model
 
 		if type(model) == str:
-			if model not in  "awg.material.Material":
+			if model not in  "awg.material.Material.Material":
 				model = ["awg.material", model]
 			### model = str2func(model)
 
@@ -25,6 +24,8 @@ class Material:
 			finally:
 				pass
 			self.type = "function"
+			self.model = model
+
 		elif str(type(model)) == "<class 'numpy.ndarray'>":
 			if np.size(model) == 1 :
 				self.type = "constant"
@@ -42,9 +43,11 @@ class Material:
 	def index(self,lmbda,T = 295):
 		"""Calculates refractive index at given wavelength and
 		   temperature using lookup data or model equation. """
+
 		if self.type == "constant":
 			n = self.model
 		elif self.type == "function":
+			
 			n = self.model(lmbda,T)
 		elif self.type == "polynomial":
 			n = np.polyval(slef.model,lmbda) # To test

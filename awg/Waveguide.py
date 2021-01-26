@@ -39,9 +39,12 @@ class Waveguide:
 		for i in _in:
 			if i not in slots[:]:
 				raise AttributeError(f"'Waveguide' object has no attribute '{i}'")
+		#print(kwargs["clad"].model, "-------------------------------------------------------------")
 		if "clad" in _in:
-			if (type(kwargs["clad"]) == types.FunctionType) or (str(type(kwargs["clad"])) == "<class 'material.Material.Material'>") or (type(kwargs["clad"]) == float) or (type(kwargs["clad"]) == int):
+			if (type(kwargs["clad"]) == types.FunctionType) or (type(kwargs["clad"]) == float) or (type(kwargs["clad"]) == int):
 				self._clad = Material(kwargs["clad"])
+			elif (str(type(kwargs["clad"])) == "<class 'awg.material.Material.Material'>"):
+				self._clad = kwargs["clad"]
 			elif type(kwargs["clad"]) == list:
 				self._clad = Material(list_to_array(kwargs["clad"]))
 			else:
@@ -50,8 +53,10 @@ class Waveguide:
 			self._clad = Material(SiO2)
 
 		if "core" in _in:
-			if (type(kwargs["core"]) == types.FunctionType) or (str(type(kwargs["core"])) == "<class 'material.Material.Material'>") or (type(kwargs["core"]) == float) or (type(kwargs["core"]) == int):
+			if (type(kwargs["core"]) == types.FunctionType) or (type(kwargs["core"]) == float) or (type(kwargs["core"]) == int):
 				self._core = Material(kwargs["core"])
+			elif (str(type(kwargs["core"])) == "<class 'awg.material.Material.Material'>"):
+				self._core = kwargs["core"]
 			elif type(kwargs["core"]) == list:
 				self._core = Material(list_to_array(kwargs["core"]))
 			else:
@@ -60,8 +65,10 @@ class Waveguide:
 			self._core = Material(Si)
 
 		if "subs" in _in:
-			if (type(kwargs["subs"]) == types.FunctionType) or (str(type(kwargs["subs"])) == "<class 'material.Material.Material'>") or (type(kwargs["subs"]) == float) or (type(kwargs["subs"]) == int):
+			if (type(kwargs["subs"]) == types.FunctionType) or (type(kwargs["subs"]) == float) or (type(kwargs["subs"]) == int):
 				self._subs = Material(kwargs["subs"])
+			elif (str(type(kwargs["subs"])) == "<class 'awg.material.Material.Material'>"):
+				self._subs = kwargs["subs"]
 			elif type(kwargs["subs"]) == list:
 				self._subs = Material(list_to_array(kwargs["subs"]))
 			else:

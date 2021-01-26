@@ -553,10 +553,10 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 def overlap(x,u,v,hu = None,hv = None):
 	if (hu == None) and (hv == None):
 		uu = np.trapz(np.conj(u)*u,x)
-		print(u) 
-		vv = np.trapz(np.conj(v)*v,x) 
+		vv = np.trapz(np.conj(v)*v,x)
 		uv = np.trapz(np.conj(u)*v,x) 
-		return abs(uv)**2/(np.sqrt(uu)*np.sqrt(vv))
+
+		return abs(uv)/(np.sqrt(uu)*np.sqrt(vv))
 	else:
 		if hu == None:
 			hu = np.zeros(len(hv),dtype = complex)

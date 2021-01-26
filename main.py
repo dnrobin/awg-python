@@ -15,10 +15,10 @@ model = AWG(clad = SiO2, core = Si, subs = SiO2, lambda_c = 1.550,
 options = SimulationOptions()
 options.PhaseErrorVariance = 0
 options.ModeType = "gaussian"
-
-#aw(model,1.550,F)
+options.PropagationLoss = 1
+options.InsertionLoss = 0.5
 Simulate(model,model.lambda_c,Options = options)
 
-#results = Spectrum(model,1.55,0.01, Options = options, Samples = 100)
+results = Spectrum(model,1.55,0.01, Options = options, Samples = 100)
 
-#measurements = Analyse(results)
+measurements = Analyse(results)
