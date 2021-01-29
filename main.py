@@ -17,8 +17,8 @@ options.PhaseErrorVariance = 0
 options.ModeType = "gaussian"
 options.PropagationLoss = 1
 options.InsertionLoss = 0.5
-Simulate(model,model.lambda_c,Options = options)
+#Simulate(model,model.lambda_c,Options = options)
 
-results = Spectrum(model,1.55,0.01, Options = options, Samples = 100)
+results = Spectrum(model,1.55,0.01, Options = options, Samples = 50)
 
 measurements = Analyse(results)

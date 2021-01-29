@@ -22,13 +22,16 @@ class Spectrum:
 			Options = SimulationOptions()
 
 		wvl = lmbda + np.linspace(-0.5,0.5,Samples)*bandwidth
+		print(wvl)
 		T = np.zeros((Samples,model.No))
 
 		
 		# Replacement for the wait bar
 		for i in range(Samples):
-			T[i,:] = Simulate(model,wvl[i],Options,points = points).transmission
-			print(Simulate(model,wvl[i],Options,points = points).transmission)
+			R = Simulate(model,wvl[i],Options = Options,points = points)
+			T[i,:] = R.transmission
+			#print(wvl[i])
+			print(Simulate(model,wvl[i],Options = Options,points = points).transmission)
 			print(f"{i+1}/{Samples}")
 
 		self.wavelength = wvl
