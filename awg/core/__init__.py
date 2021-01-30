@@ -67,10 +67,13 @@ def mat_prod(a, ma1,ma2):
 
 
 def list_to_array(lst,dtype = complex):
-	new_list = np.zeros(len(lst),dtype = dtype)
-	for i,j in enumerate(lst):
-		new_list[i] += j
-	return new_list
+	if (len(lst) > 2) and ((type(lst[0]) == int) or (type(lst[0]) == float)):
+		new_list = np.zeros(len(lst),dtype = dtype)
+		for i,j in enumerate(lst):
+			new_list[i] += j
+		return new_list
+	else:
+		return np.array([i for i in lst])
 
 
 def slabindex(lmbda0,t,na,nc,ns,**kwargs):

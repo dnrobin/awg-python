@@ -22,7 +22,7 @@ class Spectrum:
 			Options = SimulationOptions()
 
 		wvl = lmbda + np.linspace(-0.5,0.5,Samples)*bandwidth
-		print(wvl)
+
 		T = np.zeros((Samples,model.No))
 
 		
@@ -30,8 +30,6 @@ class Spectrum:
 		for i in range(Samples):
 			R = Simulate(model,wvl[i],Options = Options,points = points)
 			T[i,:] = R.transmission
-			#print(wvl[i])
-			print(Simulate(model,wvl[i],Options = Options,points = points).transmission)
 			print(f"{i+1}/{Samples}")
 
 		self.wavelength = wvl

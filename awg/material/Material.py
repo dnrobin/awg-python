@@ -4,11 +4,15 @@ awg.material is a package for modeling material chromatic dispersion.
 import types
 from . import *
 from . import dispersion
+from ..core import *
 
 
 class Material:
 	def __init__(self, model):
-	
+
+		if type(model) == list:
+			model = list_to_array(model)
+		print(type(model))
 		if (str(type(model)) == "<class 'awg.material.Material.Material'>"):
 			self.type = model.type
 			self.model = model.model
@@ -25,7 +29,8 @@ class Material:
 				pass
 			self.type = "function"
 			self.model = model
-
+		elif (type(model) == int) or (type(model) == float):
+			self.type = "constant"
 		elif str(type(model)) == "<class 'numpy.ndarray'>":
 			if np.size(model) == 1 :
 				self.type = "constant"
