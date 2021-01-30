@@ -22,8 +22,9 @@ from .Spectrum import Spectrum
 from .Analyse import  Analyse
 from .material import *
 from .material.Material import Material
+from .material.dispersion import dispersion
 
-from .material import (
-    Material,
-    dispersion
-)
+#from .material import (
+#    Material,
+#    dispersion
+#)

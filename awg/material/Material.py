@@ -2,9 +2,10 @@
 awg.material is a package for modeling material chromatic dispersion.
 """
 import types
+import scipy as scp
 from . import *
 from . import dispersion
-from ..core import *
+from ..core import list_to_array
 
 
 class Material:
@@ -12,7 +13,6 @@ class Material:
 
 		if type(model) == list:
 			model = list_to_array(model)
-		print(type(model))
 		if (str(type(model)) == "<class 'awg.material.Material.Material'>"):
 			self.type = model.type
 			self.model = model.model
@@ -52,14 +52,30 @@ class Material:
 		if self.type == "constant":
 			n = self.model
 		elif self.type == "function":
-			
-			n = self.model(lmbda,T)
+			try:
+				n = self.model(lmbda,T = T)
+			except TypeError:
+				n = self.model(lmbda)
 		elif self.type == "polynomial":
 			n = np.polyval(slef.model,lmbda) # To test
+		elif self.type == "lookup":
+			wavelength = self.model[:,0]
+			index = self.model[:,1]
+			n = np.interp(lmbda,wavelength,index)
 		return n
 
 	def dispersion(self,lmbda1,lmbda2, point = 100):
 		return dispersion.dispersion(self.index, lmbda1, lmbda2, point = point)
 
+	def groupindex(self,lmbda,T = 295):
+
+		n0 = self.index(lmbda,T)
+		n1 =self.index(lmbda-0.1,T)
+		n2 = self.index(lmbda+0.1,T)
+
+		return n0 - lmbda*(n2-n1)/0.2
+
+	def groupDispersion(self,lmbda1,lmbda2, **kwargs):
+		return dispersion.dispersion(self.groupindex,lmbda1,lmbda2,**kwargs)
 
 

@@ -1,5 +1,4 @@
 from . import *
-#from .. import Waveguide
 import numpy as np
 
 
