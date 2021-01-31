@@ -2,7 +2,8 @@
 awg.material is a package for modeling material chromatic dispersion.
 """
 import types
-import scipy as scp
+#import scipy as scp
+from scipy.interpolate import Akima1DInterpolator
 from . import *
 from . import dispersion
 from ..core import list_to_array
@@ -61,7 +62,7 @@ class Material:
 		elif self.type == "lookup":
 			wavelength = self.model[:,0]
 			index = self.model[:,1]
-			n = np.interp(lmbda,wavelength,index)
+			n = Akima1DInterpolator(wavelength,index).__call__(lmbda,nu = 0,extrapolate = True)
 		return n
 
 	def dispersion(self,lmbda1,lmbda2, point = 100):

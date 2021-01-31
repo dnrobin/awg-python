@@ -4,7 +4,7 @@ import numpy as np
 
 def DataFormat(D,sz):
 	if len(D) == 0:
-		D = np.zeros(sz)[0]
+		D = np.zeros(sz, dtype = complex)[0]
 		return D
 	
 	shape_D = [1]
@@ -88,7 +88,7 @@ class Field:
 					self._Ey = np.conj(E[1])
 			
 			if len(E) > 2:
-				if dimens > 2:
+				if self.dimens > 2:
 					self._Ez = E[2]
 				else:
 					self._Ez = np.conj(E[2])
@@ -141,38 +141,30 @@ class Field:
 	def poynting(self):
 		if self.hasMagnetic() :
 			#print(self._Ex,"Ex")
-			return  self.Ex*np.conjugate(self.Hy) - self._Ey*np.conjugate(self.Hx)
+			return  self.Ex*np.conjugate(self.Hy) - self.Ey*np.conjugate(self.Hx)
 		else:
 
 			return self.Ex*np.conjugate(self.Ex)
 
 	def power(self):
+
 		if self.dimens == 3:
 			return np.trapz(np.trapz(self._y, self.poynting()),self._x)
 		else:
 			if self.dimens == 1:
-				#print(self.poynting(),"Poynting")
+				#print(self.poynting(),self._x)
 				return np.trapz(self.poynting(),self._x)
 			else:
 				return np.trapz(self.poynting(),self._y)
 
+
 	def normalize(self,P = 1):
 		P0 = self.power()
-		#for n in [new_Ex]:#,self.Ey, self.Ez]: ### Ça fonctionne
 		for i in range(len(self.Edata[0])):
 			self.Edata[0][i] = self.Edata[0][i]*np.sqrt(P/P0)
-				#print(n[i]*np.sqrt(P/P0), self._Ex)
-		for n in [self.Hx,self.Hy, self.Hz]: ### Ça fonctionne
-			for i in range(len(n)):
-				n[i] = n[i]*np.sqrt(P/P0)
-		
-		#for i in range(len(self._Ex)):
-		#	self._Ex[i] = self._Ex[i]*np.sqrt(P/P0)
-		#	for j in range(len(self.Edata[0])):
-		#			self.Edata[i][j] = self.Edata[i][j]*(P/P0)**0.5
-		#for i in range(len(self.Hdata)):
-		#	for j in range(len(self.Hdata[0])):
-		#		self.Hdata[i][j] = self.Hdata[i][j]*(P/P0)**0.5
+
+		for i in range(len(self.Hdata[0])):
+			self.Hdata[0][i] = self.Hdata[0][i]*np.sqrt(P/P0)
 		return self
 
 	def hasElectric(self):
@@ -213,7 +205,7 @@ class Field:
 		return self.dimens >2
 
 	def isElectroMagnetic(self):
-		return self.HasElectric and self.HasMagnetic
+		return self.hasElectric() and self.hasMagnetic()
 
 	def getSize(self):
 		return [max([1,1][i],[len(self._y),len(self._x)][i]) for i in range(2)]

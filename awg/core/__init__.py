@@ -428,22 +428,28 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 
 	t = clamp(t,0,h)
 
-	_in = kwargs
-	
-	if "x" not in _in.keys():
-		_in["x"] = []
+	_in = kwargs.keys()
 
-	if "Polarisation" in _in.keys():
-		if _in["Polarisation"] in ["TE","te","TM","tm"]:
-			pass
+	if "Polarisation" in _in:
+		if kwargs["Polarisation"] in ["TE","te","TM","tm"]:
+			Polarisation = kwargs["Polarisation"]
 	else:
-		_in["Polarisation"] = "TE"
+		Polarisation = "TE"
 	
-	if "XRange" not in _in.keys():
-		_in["XRange"] = [-3*w,3*w]
+	if "XRange" in _in:
+		Xrange = kwargs["XRange"]
+	else:
+		Xrange = [-3*w,3*w]
 
-	if "Sample" not in _in.keys():
-		_in["Sample"] = 100
+	if "Points" in _in:
+		Points = kwargs["Points"]
+	else:
+		Points = 100
+
+	if "x" in _in:
+		x = kwargs["x"]
+	else:
+		x = np.linspace(Xrange[0],Xrange[1],Points)
 
 	if (type(na) == types.FunctionType) or (str(type(na)) == "<class 'material.Material.Material'>"):
 		na = na(lmbda0)
@@ -452,14 +458,10 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	if (type(ns) == types.FunctionType) or (str(type(ns)) == "<class 'material.Material.Material'>"):
 		ns = ns(lmbda0)
 
-	if _in["x"] == []:
-		x = np.linspace(_in["XRange"][0],_in["XRange"][1],_in["Sample"])
-	else:
-		x = _in["x"]
 
-	ni1 = np.zeros(len(x))
+	ni1 = np.zeros(len(x),dtype =complex)
 
-	if _in["Polarisation"].upper() in "TE":
+	if Polarisation.upper() in "TE":
 		neff = wgindex(lmbda0,w,h,t,na,nc,ns,Polarisation = "TE",Modes = 1)[0]
 
 		n_I = slabindex(lmbda0,h,na,nc,ns,Polarisation = "TE",Modes = 1)[0]
@@ -469,7 +471,7 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 		else:
 			n_II = na
 
-		[Ek,Hk,_,_] = slabmode(lmbda0,w,n_II,n_I,n_II, Polarisation = "TM")
+		[Ek,Hk,_,_] = slabmode(lmbda0,w,n_II,n_I,n_II, Polarisation = "TM", y = x, Modes = 1)
 		#print(Hk)
 		f = max(Ek[:,0,1])
 

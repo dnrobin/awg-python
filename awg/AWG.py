@@ -630,7 +630,6 @@ def fpr1(model,lmbda,F0,**kwargs):
 
     xi = F0.x
     ui = F0.Ex
-
     ns = model.getSlabWaveguide().index(lmbda,1)[0]
 
     if len(x) == 0:
@@ -642,7 +641,7 @@ def fpr1(model,lmbda,F0,**kwargs):
     r = model.R/2
     if model.confocal:
         r = model.R
-
+    print(R,r)
 
     s0 = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
     t0 = s0/r

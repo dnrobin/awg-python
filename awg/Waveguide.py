@@ -161,15 +161,16 @@ class Waveguide:
 
 		elif ModeType == "gaussian":
 			E,H,_ = gmode(lmbda, self._w, self._h, n2, n1, x = x)
-			#print(E)
+			
+			return Field.Field(x,E,([],H))
 
 		elif ModeType == "solve":
 			E,H, _, _ = wgmode(lmbda,self._w,self._h,self._t,n2,n1,n3,x = x)
-
+			return Field.Field(x,E,H)
 		else:
 			raise ValueError("Unknow mode type")
 
-		return Field.Field(x,E,([],H))
+
 
 
 

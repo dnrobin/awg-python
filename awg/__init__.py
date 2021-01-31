@@ -20,6 +20,7 @@ from .SimulationOptions import SimulationOptions
 from .Simulate import Simulate
 from .Spectrum import Spectrum
 from .Analyse import  Analyse
+from .plotfield import plotfield
 from .material import *
 from .material.Material import Material
 from .material.dispersion import dispersion
