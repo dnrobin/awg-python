@@ -507,21 +507,9 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 
 
 
+# Old version of diffract
+"""def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 
-def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
-	"""	DIFFRACT   1-D propagation using diffraction integral.
-	
-	   u = DIFFRACT(lambda, ui, xi, xf, zf) Numerically solves the one 
-	   dimensional diffraction integral for propagation to the output 
-	   coordinate(s) given by (xf,zf) from the input plane given by (xi,0)
-	   with initial field distribution ui. The incoming light wave vector is 
-	   assumed to be aligned with z-axis and the traveling wave is described 
-	   by the retarded phase picture exp(-jkz).
-	
-	   u = DIFFRACT(..., METHOD) specifies which integral definition to use.
-	   The choices are:
-	       'rayleigh'  - (default) general purpose Rayleigh-Sommerfeld integral
-	       'fresnel'   - Fresnel-Kirchoff approximation."""
 
 	if (type(zf) == int) or (type(zf) == float) or (len(zf) == 1):
 		zf = zf*np.ones(len(xf),dtype = complex)
@@ -552,10 +540,10 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 		
 		else:
 			raise ValueError(f"Unrecognized {method} method.")
-	return uf
+	return uf"""
 
 
-def diffract2(lmbda,ui,xi,xf,zf, method = "rs"):
+def diffract(lmbda,ui,xi,xf,zf, method = "rs"):
 	if (len(zf) == 1) or (type(zf) == int) or (type(zf) == float):
 		zf = zf*np.ones(len(xf))
 	elif len(zf) != len(xf):

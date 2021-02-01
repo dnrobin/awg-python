@@ -671,26 +671,8 @@ def fpr1(model,lmbda,F0,**kwargs):
     xf = R*np.sin(a)
     zf = model.defocus + R*np.cos(a)
 
-    uf = diffract2(lmbda/ns,up,xp,xf,zf)[0]
-    print(uf)
+    uf = diffract(lmbda/ns,up,xp,xf,zf)[0]
 
-
-
-
-    """s0 = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
-    t0 = s0/r
-    x0 = r*np.sin(t0)
-    z0 = r*(1-np.cos(t0))
-    #print(s0,t0,x0,z0,R,r,sep = "\n")
-    t = sf/R
-    x = R*np.sin(t)
-    z = R*np.cos(t)
-    #print(t,x,z,sep = "\n")
-    a0 = np.arctan(np.sin(t0)/(1+np.cos(t0)))
-    xf = (x+x0)*np.cos(a0)+(z+z0)*np.sin(a0)
-    zf = -(x+x0)*np.sin(a0)+(z+z0)*np.cos(a0)
-
-    uf = diffract(lmbda/ns,ui,xi,xf,zf)"""
 
     return Field.Field(sf,uf).normalize(F0.power())
 
@@ -727,9 +709,9 @@ def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
     k0 = 2*np.pi/lmbda
     nc = model.getArrayWaveguide().index(lmbda,1)[0]
 
-    dr = model.R * (1/np.cos(x0/model.R)-1)
-    dp0 = 2*k0*nc*dr
-    u0 = u0*np.exp(-1j*dp0)
+    #dr = model.R * (1/np.cos(x0/model.R)-1)
+    #dp0 = 2*k0*nc*dr
+    #u0 = u0*np.exp(-1j*dp0)
 
     pnoise = randn(1,model.N)[0]*np.sqrt(PhaseErrorVar)
     iloss = 10**(-abs(InsertionLoss)/10)
@@ -741,7 +723,7 @@ def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
     for i in range(model.N):
         xc = (i - (model.N-1)/2)*model.d
 
-        Fk =  Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType)#.normalize()
+        Fk =  Aperture.mode(lmbda,x = x0-xc, ModeType = ModeType).normalize()
 
         Ek = Fk.Ex *rect((x0-xc)/model.d)
 
@@ -754,7 +736,6 @@ def aw(model,lmbda,F0,**kwargs): # F0 = initial Field
 
         ploss = 10**(-abs(PropagationLoss*L*1e-4)/10)
         t = t*ploss*iloss**2
-
 
 
         Efield = P0*t*Ek*np.exp(-1j*phase)
@@ -777,11 +758,10 @@ def fpr2(model,lmbda,F0,**kwargs):
     else:
         points = 250
 
-    xi = F0.x
-    ui = F0.Ex
+    x0 = F0.x
+    u0 = F0.Ex
 
     ns = model.getSlabWaveguide().index(lmbda,1)[0]
-    nc = model.getArrayWaveguide().index(lmbda,1)[0]
 
     R = model.R
     r = R/2
@@ -789,15 +769,21 @@ def fpr2(model,lmbda,F0,**kwargs):
         r = R
 
     if len(x) == 0:
-        sf = np.linspace(-1/2,1/2,points)*(model.No+4)*max(model.do,model.wo)
+        sf = np.linspace(-np.pi/2,np.pi/2,points)*r
     else:
         sf = x
 
-    uf = 0
 
-    xf = r*np.sin(sf/r)
-    zf = r*(1+np.cos(sf/r))
-    uf = diffract(lmbda/ns,ui,xi,xf,zf)
+    a = x0/R
+    xp = R*np.tan(a)
+    dp = R*(1/np.cos(a))-R
+    up = u0*np.exp(1j*2*np.pi/lmbda*ns*dp)
+
+    a = sf/r
+    xf = r*np.sin(a)
+    zf = (model.defocus+R-r)+r*np.cos(a)
+
+    uf = diffract(lmbda/ns,up,xp,xf,zf)[0]
 
     return Field.Field(sf,uf).normalize(F0.power())
 
@@ -818,7 +804,7 @@ def ow(model,lmbda,F0,**kwargs):
 
     Aperture = model.getOutputAperture()
 
-    T = np.zeros(model.No)
+    T = np.zeros(model.No, dtype = complex)
 
     for i in range(model.No):
 
@@ -830,4 +816,4 @@ def ow(model,lmbda,F0,**kwargs):
         Ek = Ek*rect((x0-xc)/max(model.do,model.wo))
 
         T[i] = P0*overlap(x0,u0,Ek)**2
-    return T
+    return abs(T)

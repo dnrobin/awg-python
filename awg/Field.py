@@ -160,11 +160,12 @@ class Field:
 
 	def normalize(self,P = 1):
 		P0 = self.power()
-		for i in range(len(self.Edata[0])):
-			self.Edata[0][i] = self.Edata[0][i]*np.sqrt(P/P0)
-
-		for i in range(len(self.Hdata[0])):
-			self.Hdata[0][i] = self.Hdata[0][i]*np.sqrt(P/P0)
+		for j in range(len(self.Edata)):
+			for i in range(len(self.Edata[j])):
+				self.Edata[j][i] = self.Edata[j][i]*np.sqrt(P/P0)
+		for j in range(len(self.Hdata)):
+			for i in range(len(self.Hdata[j])):
+				self.Hdata[j][i] = self.Hdata[j][i]*np.sqrt(P/P0)
 		return self
 
 	def hasElectric(self):
@@ -231,7 +232,7 @@ class Field:
 	@property
 	def E(self):
 		if self.isScalar:
-			return self._Ex
+			return self.Edata[0]
 		else:
 			return self.Edata
 

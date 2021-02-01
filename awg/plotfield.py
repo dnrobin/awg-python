@@ -108,7 +108,6 @@ def plotfield(X, Y = [], **kwargs):
 		ax1.set_xlabel(f"{xname}($\mu$m)")
 		ax1.set_ylabel(f"{yname}($\mu$m)")
 
-
 	if F.isBidimensional():
 		### TO DO when Field will accept 2D Field
 		pass
