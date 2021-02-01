@@ -33,6 +33,7 @@ class AWG:
         '_lo',        # output waveguide offset spacing (def. 0)
         '_df',        # radial defocus (def. 0)
         '_confocal',  # use confocal arrangement rather than Rowland (def. false)
+        '_defocus',
         '_wa',        # waveguide aperture width
         '_dl',        # waveguide length increment
         '_df',        # radial defocus
@@ -246,6 +247,11 @@ class AWG:
                 raise ValueError("The confocal arrangement use instead of Rowland circle must be either True or False")
         else:
             self._confocal = False
+
+        if "defocus" in _in:
+            self._defocus = kwargs["defocus"]
+        else:
+            self._defocus = 0
 
         if "wa" in _in:
             if ((type(kwargs["wa"]) == int) or (type(kwargs["wa"]) == float)) and (kwargs["wa"] > 0):
@@ -536,6 +542,20 @@ class AWG:
         else:
             raise ValueError("The confocal arrangement use instead of Rowland circle must be either True or False")
 
+
+    @property
+    def defocus(self):
+        return self._defocus
+    
+    @defocus.setter
+    def defocus(self,defocus):
+        if ((type(defocus) == int) or (type(defocus) == float)) and (defocus > 0):
+            self._defocus = defocus
+        else:
+            raise ValueError("The defocus or R must be a positive float or integer")
+
+
+
     @property
     def wa(self):
         return self._wa
@@ -543,7 +563,7 @@ class AWG:
     @wa.setter
     def wa(self,wa):
         if ((type(wa) == int) or (type(wa) == float)) and (wa > 0):
-            self._wi = wa
+            self._wa = wa
         else:
             raise ValueError("The waveguide aperture width 'wa' [um] must be a positive float or integer")
 
@@ -641,9 +661,23 @@ def fpr1(model,lmbda,F0,**kwargs):
     r = model.R/2
     if model.confocal:
         r = model.R
-    print(R,r)
 
-    s0 = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
+    a = xi/r
+    xp = r*np.tan(a)
+    dp = r*(1/np.cos(a))-r
+    up = ui*np.exp(1j*2*np.pi/lmbda*ns*dp)
+
+    a = sf/R
+    xf = R*np.sin(a)
+    zf = model.defocus + R*np.cos(a)
+
+    uf = diffract2(lmbda/ns,up,xp,xf,zf)[0]
+    print(uf)
+
+
+
+
+    """s0 = model.li + (_input-(model.Ni-1)/2)*max(model.di,model.wi)
     t0 = s0/r
     x0 = r*np.sin(t0)
     z0 = r*(1-np.cos(t0))
@@ -656,7 +690,7 @@ def fpr1(model,lmbda,F0,**kwargs):
     xf = (x+x0)*np.cos(a0)+(z+z0)*np.sin(a0)
     zf = -(x+x0)*np.sin(a0)+(z+z0)*np.cos(a0)
 
-    uf = diffract(lmbda/ns,ui,xi,xf,zf)
+    uf = diffract(lmbda/ns,ui,xi,xf,zf)"""
 
     return Field.Field(sf,uf).normalize(F0.power())
 

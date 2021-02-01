@@ -555,6 +555,21 @@ def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
 	return uf
 
 
+def diffract2(lmbda,ui,xi,xf,zf, method = "rs"):
+	if (len(zf) == 1) or (type(zf) == int) or (type(zf) == float):
+		zf = zf*np.ones(len(xf))
+	elif len(zf) != len(xf):
+		raise ValueError('Coordinate vectors x and z must be the same length.')
+	k = 2*np.pi/lmbda
+
+	uf = np.zeros(len(xf), dtype = complex)
+	for i in range(len(xf)):
+		r = np.sqrt((xf[i]-xi)**2+zf[i]**2)
+		if method == "rs":
+			uf[i] = np.sqrt(zf[i]/(2*np.pi))*np.trapz(ui*(1j*k+1/r)*np.exp(-1j*k*r)/r**2,xi)
+	return uf,xf
+
+
 def overlap(x,u,v,hu = None,hv = None):
 	if (hu == None) and (hv == None):
 		uu = np.trapz(np.conj(u)*u,x)
