@@ -4,8 +4,8 @@ from awg.core import *
 
 import matplotlib.pyplot as plt
 
-x = Waveguide()
-print(x.__doc__)
+x = Field([1,2,3,4,5],[0,1,2,1,0])
+print(x)
 
 """model = AWG(clad = SiO2, core = Si, subs = SiO2, lambda_c = 1.550,
             Ni = 1, No = 9, w = 0.450, h = 0.220, N = 40, m = 75, R = 130,

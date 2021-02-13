@@ -1,6 +1,6 @@
 from .core import *
 import numpy as np
-
+from tabulate import tabulate
 
 def DataFormat(D,sz):
 	if len(D) == 0:
@@ -35,6 +35,26 @@ def DataFormat(D,sz):
 	return D
 
 class Field:
+	"""
+	INPUT:
+
+	X - Coordinate data, one of:
+		vector  - A one dimensional vector of x coordinates.
+		cell	- A cell array containing x and y coordinates: {x, y}.
+			Note: for representing only y coordinates, pass a
+			cell array of the form {[], y}.
+
+	E - Electric field data.
+	H - (optional) magnetic field data. Both of these fields can be 
+		one of:
+			vector  - A one dimensional vector of data points. In this
+				case, the data will be mapped to the x-component 
+				of the field by default.
+			cell	- A cell array containing x, y and z component data
+				in the form: {Ux, Uy, Uz}. For omitting data of
+				certain components, use empty arrays. For example
+				H = {[],Hy,[]}.
+	"""
 	def __init__(self,X, E, H = []):
 		self.scalar = True
 		if len(X) < 1:
@@ -139,6 +159,9 @@ class Field:
 		self.salut = 5
 
 	def poynting(self):
+		"""
+		Returns the Poynting vector component z (transverse power density)
+		"""
 		if self.hasMagnetic() :
 			#print(self._Ex,"Ex")
 			return  self.Ex*np.conjugate(self.Hy) - self.Ey*np.conjugate(self.Hx)
@@ -147,7 +170,9 @@ class Field:
 			return self.Ex*np.conjugate(self.Ex)
 
 	def power(self):
-
+		"""
+		Return power carried by the field in W or W/μm
+		"""
 		if self.dimens == 3:
 			return np.trapz(np.trapz(self._y, self.poynting()),self._x)
 		else:
@@ -159,6 +184,11 @@ class Field:
 
 
 	def normalize(self,P = 1):
+		"""
+		Normalize the field relatively to it's power.
+
+		P - Normalized Value
+		"""
 		P0 = self.power()
 		for j in range(len(self.Edata)):
 			for i in range(len(self.Edata[j])):
@@ -169,12 +199,18 @@ class Field:
 		return self
 
 	def hasElectric(self):
+		"""
+		Look if any electric field is define.
+		"""
 		if np.any([self.Edata]):
 			return True
 		else:
 			return False
 
 	def hasMagnetic(self):
+		"""
+		Look if any magnetic field is define.
+		"""
 		if max([np.any(i) for i in self.Hdata]):
 			return True
 		else:
@@ -182,33 +218,57 @@ class Field:
 
 
 	def getMagnitudeE(self):
+		"""
+		Return the electric field magnitude.
+		"""
 		A = []
 		for i in range(len(self.Edata[0])):
 				A.append(sum([abs(self.Edata[j][i])**2 for j in range(len(self.Edata))])**0.5)
 		return A
 	
 	def getMagnitudeH(self):
+		"""
+		Return the magnetic field magnitude.
+		"""
 		A = []
 		for i in range(len(self.Hdata[0])):
 				A.append(sum([abs(self.Hdata[j][i])**2 for j in range(len(self.Hdata))])**0.5)
 		return A
 
 	def isScalar(self):
+		"""
+		Look if there is only one component field.
+		"""
 		return self.scalar
 
 	def hasX(self):
+		"""
+		Look if there is any field dendity over X.
+		"""
 		return (self.dimens == 1) or (self.dimens == 3)
 
 	def hasY(self):
+		"""
+		Look if there is any field density over Y.
+		"""
 		return (self.dimens == 2) or (self.dimens == 3)
 
 	def isBidimensional(self):
+		"""
+		Look if there are X and Y field density.
+		"""
 		return self.dimens >2
 
 	def isElectroMagnetic(self):
+		"""
+		Look if there is electric and magnetic field.
+		"""
 		return self.hasElectric() and self.hasMagnetic()
 
 	def getSize(self):
+		"""
+		Return the field size.
+		"""
 		return [max([1,1][i],[len(self._y),len(self._x)][i]) for i in range(2)]
 
 	def offsetCoordinates(self,dx = 0,dy = 0):
@@ -219,7 +279,22 @@ class Field:
 		return self
 
 	def __str__(self):
-		return f"{self._Hx},\n \n{self._Ex} \n \n{self.normalize()._Ex}"
+		if self.hasX():
+			x = f"[{self.Xdata[0][0]},...,{self.Xdata[0][-1]}]"
+		else:
+			x = "None"
+		if self.hasY():
+			y = f"[{self.Xdata[1][0]},...,{self.Xdata[1][-1]}]"
+		else:
+			y = "None"
+
+		return tabulate([['X', x, "X values"], ['Y', y, "Y values"], 
+					['E', self.E.shape, "Electrical field shape"],['H', self.H.shape, "Magnetic field shape"]], headers=['parameters', 'Value', 'definition'])
+
+
+
+
+	### Define getter and setter for the Field object ###
 
 	@property
 	def x(self):
