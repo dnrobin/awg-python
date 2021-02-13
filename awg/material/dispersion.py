@@ -4,6 +4,14 @@ import numpy as np
 
 
 def dispersion(model,lmbda1,lmbda2,**kwargs):
+		"""
+		Return the dispersion relation between 2 wavelenght.
+
+		lmdba1 - minimal wavelenght to consider [μm]
+		lmbda2 - maximal wavelenght to consider [μm]
+		point  - number of point to consider in the relation (optional)(def.100)
+
+		"""
 	p = kwargs
 	if "point" not in p.keys():
 		p["point"] = 100

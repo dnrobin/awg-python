@@ -40,7 +40,6 @@ class Waveguide:
 		for i in _in:
 			if i not in slots[:]:
 				raise AttributeError(f"'Waveguide' object has no attribute '{i}'")
-		#print(kwargs["clad"].model, "-------------------------------------------------------------")
 		if "clad" in _in:
 			if (type(kwargs["clad"]) == types.FunctionType) or (type(kwargs["clad"]) == float) or (type(kwargs["clad"]) == int):
 				self._clad = Material(kwargs["clad"])
@@ -107,12 +106,13 @@ class Waveguide:
 		else:
 			self._t = 0
 
-	def index(self,lmbda, modes = np.inf):
+	def index(self,lmbda, modes = np.inf, T = 295):
 		""" 
-		Get the index at a specific wavelength.
+		Return the index at a specific wavelength.
 
 		lmbda - wavelenght [μm]
-		modes - 
+		modes - Number of modes to consider
+		T     - Température of the material [K] (optional)(def.295)
 		"""
 		n1 = self.core.index(lmbda)
 		n2 = self.clad.index(lmbda)
@@ -121,10 +121,25 @@ class Waveguide:
 		return neff
 
 	def dispersion(self, lmbda1,lmbda2, point = 100):
+		"""
+		Return the dispersion relation between 2 wavelenght.
+
+		lmdba1 - minimal wavelenght to consider [μm]
+		lmbda2 - maximal wavelenght to consider [μm]
+		point  - number of point to consider in the relation (def.100)
+
+		"""
 		return dispersion.dispersion(self.index,lmbda1,lmbda2, point = point)
 
 
 	def groupindex(self,lmbda,T = 295):
+		"""
+		Return the group index at a specific wavelenght.
+
+		lmbda - Wavelenght to consider [μm]
+		T     - Temperature of the material [K] (optional)(def.295)
+
+		"""
 		n0 = self.index(lmbda,T)
 		n1 = self.index(lmbda-0.1,T)
 		n2 = self.index(lmbda+0.1,T)
@@ -132,10 +147,30 @@ class Waveguide:
 		return n0 -lmbda*(n2-n1)/2
 
 	def groupDispersion(self,lmbda1,lmbda2, point = 100):
+		"""
+		Return the group dispersion relation between 2 wavelenght.
+
+		lmdba1 - minimal wavelenght to consider [μm]
+		lmbda2 - maximal wavelenght to consider [μm]
+		point  - number of point to consider in the relation (def.100)
+
+		"""
 
 		return dispersion.dispersion(self.groupindex,lmbda1,lmbda2,point = point)
 
-	def mode(self,lmbda,**kwargs): ### Generate a Field completly independant of the implanted Field
+	def mode(self,lmbda,**kwargs):
+		"""
+		Generate the waveguide mode at a specific wavelenght.
+
+
+		lmbda     - Wavelenght at wich the mode will be generated
+		ModeTyepe - The type of mode to consider (optional) (def.gaussian)
+						rect     - generate a rectangular mode
+						gaussian - generate mode with the gaussian approximation
+						solve    - generate mode with the effetive index methode
+		XLimits   - range along the x to consider in the mode generation (optional)
+		point     - number of point to consider in the mode generation (def.100)
+		"""
 		
 		_in = kwargs.keys()
 		

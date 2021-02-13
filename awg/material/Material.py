@@ -47,8 +47,13 @@ class Material:
 			self.model = model
 
 	def index(self,lmbda,T = 295):
-		"""Calculates refractive index at given wavelength and
-		   temperature using lookup data or model equation. """
+		""" 
+		Return the index at a specific wavelength.
+
+		lmbda - wavelenght [μm]
+		T     - Température of the material [K] (optional)(def.295)
+
+		"""
 
 		if self.type == "constant":
 			n = self.model
@@ -66,11 +71,24 @@ class Material:
 		return n
 
 	def dispersion(self,lmbda1,lmbda2, point = 100):
-		""" Return the dispersion relation between lambda1 and lambda2 on n points"""
+		"""
+		Return the dispersion relation between 2 wavelenght.
+
+		lmdba1 - minimal wavelenght to consider [μm]
+		lmbda2 - maximal wavelenght to consider [μm]
+		point  - number of point to consider in the relation (optional)(def.100)
+
+		"""
 		return dispersion.dispersion(self.index, lmbda1, lmbda2, point = point)
 
 	def groupindex(self,lmbda,T = 295):
-		""" Return the group index at lmbda """
+		"""
+		Return the group index at a specific wavelenght.
+
+		lmbda - Wavelenght to consider [μm]
+		T     - Temperature of the material [K] (optional)(def.295)
+
+		"""		
 		n0 = self.index(lmbda,T)
 		n1 =self.index(lmbda-0.1,T)
 		n2 = self.index(lmbda+0.1,T)
@@ -78,6 +96,14 @@ class Material:
 		return n0 - lmbda*(n2-n1)/0.2
 
 	def groupDispersion(self,lmbda1,lmbda2, **kwargs):
+		"""
+		Return the group dispersion relation between 2 wavelenght.
+
+		lmdba1 - minimal wavelenght to consider [μm]
+		lmbda2 - maximal wavelenght to consider [μm]
+		point  - number of point to consider in the relation (optional)(def.100)
+
+		"""
 		return dispersion.dispersion(self.groupindex,lmbda1,lmbda2,**kwargs)
 
 

@@ -4,10 +4,8 @@ from awg.core import *
 
 import matplotlib.pyplot as plt
 
-print(len(np.shape(np.array([1,2,3]))))
-
 x = Waveguide()
-print(x.index(1.5))
+print(x.__doc__)
 
 """model = AWG(clad = SiO2, core = Si, subs = SiO2, lambda_c = 1.550,
             Ni = 1, No = 9, w = 0.450, h = 0.220, N = 40, m = 75, R = 130,
