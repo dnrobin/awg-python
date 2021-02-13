@@ -3,6 +3,7 @@ from .material import *
 from .material.Material import Material
 from .material import dispersion
 from . import Field
+from tabulate import tabulate
 import types
 
 class Waveguide:
@@ -47,6 +48,8 @@ class Waveguide:
 				self._clad = kwargs["clad"]
 			elif type(kwargs["clad"]) == list:
 				self._clad = Material(list_to_array(kwargs["clad"]))
+			elif str(type(kwargs["clad"])) == "<class 'numpy.ndarray'>":
+				self._clad = Material(kwargs["clad"])
 			else:
 				raise ValueError("The cladding must be a material or a float representing its refractive index.")
 		else:
@@ -59,6 +62,8 @@ class Waveguide:
 				self._core = kwargs["core"]
 			elif type(kwargs["core"]) == list:
 				self._core = Material(list_to_array(kwargs["core"]))
+			elif str(type(kwargs["core"])) == "<class 'numpy.ndarray'>":
+				self._core = Material(kwargs["core"])
 			else:
 				raise ValueError("The core must be a material or a float representing its refractive index.")
 		else:
@@ -71,6 +76,8 @@ class Waveguide:
 				self._subs = kwargs["subs"]
 			elif type(kwargs["subs"]) == list:
 				self._subs = Material(list_to_array(kwargs["subs"]))
+			elif str(type(kwargs["subs"])) == "<class 'numpy.ndarray'>":
+				self._subs = Material(kwargs["subs"])
 			else:
 				raise ValueError("The substrate must be a material or a float representing its refractive index.")
 		else:
@@ -101,6 +108,12 @@ class Waveguide:
 			self._t = 0
 
 	def index(self,lmbda, modes = np.inf):
+		""" 
+		Get the index at a specific wavelength.
+
+		lmbda - wavelenght [μm]
+		modes - 
+		"""
 		n1 = self.core.index(lmbda)
 		n2 = self.clad.index(lmbda)
 		n3 = self.subs.index(lmbda)
@@ -171,11 +184,50 @@ class Waveguide:
 			raise ValueError("Unknow mode type")
 
 
+	def __str__(self):
+		if type(self._clad.model) == types.FunctionType:
+			clad = self._clad.model.__name__
+		elif self._clad.type == "constant":
+			clad = self._clad.model
+		elif self._clad.type == "polynomial":
+			if len(self._clad.model) <= 3:
+				clad = self._clad.model
+			else:
+				clad = f"[{self._clad.model[0]},...,{self._clad.model[-1]}]"
+		elif self._clad.type == "lookup":
+			clad = "lookup table"
+
+		if type(self._core.model) == types.FunctionType:
+			core = self._core.model.__name__
+		elif self._core.type == "constant":
+			core = self._core.model
+		elif self._core.type == "polynomial":
+			if len(self._core.model) <= 3:
+				core = self._core.model
+			else:
+				core = f"[{self._core.model[0]},...,{self._core.model[-1]}]"
+		elif self._core.type == "lookup":
+			core = "lookup table"
+
+		if type(self._subs.model) == types.FunctionType:
+			subs = self._subs.model.__name__
+		elif self._subs.type == "constant":
+			subs = self._subs.model
+		elif self._subs.type == "polynomial":
+			if len(self._subs.model) <= 3:
+				subs = self._subs.model
+			else:
+				subs = f"[{self._subs.model[0]},...,{self._subs.model[-1]}]"
+		elif self._subs.type == "lookup":
+			subs = "lookup table"
+
+		return tabulate([['clad', clad , "clad material"], ['core', core, "core material"], 
+					['subs', subs, "subs material"],['w', self._w,"core width [\u03BCm]"],['h', self._h,"core height [\u03BCm]"],
+					["t",self._t,"slab thickess for rib waveguides [\u03BCm]"]], headers=['parameters', 'Value', 'definition'])
 
 
 
-
-
+    ### Define getter and setter for the Waveguide object ### 
 	@property
 	def clad(self):
 		return self._clad

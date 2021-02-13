@@ -15,7 +15,7 @@ class Simulate:
 		else:
 			Options = SimulationOptions()
 
-		if len(Options.CustomInputField) != 0:
+		if Options.CustomInputField != []:
 			F_iw = iw(model,lmbda,_input,Options.CustomInputField)
 		else:
 			F_iw = iw(model,lmbda,_input, ModeType = Options.ModeType, points = points)

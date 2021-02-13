@@ -43,8 +43,8 @@ class Material:
 					model = model.conj().T
 				if np.shape(model)[1] > 2:
 					raise ValueError("Invalid model argument provided for Material(<model>), data set must be a 2 column matrix with column 1 containing wavelength data and column 2 containing refractive index.")
-			self.type = "lookup"
-		self.model = model
+				self.type = "lookup"
+			self.model = model
 
 	def index(self,lmbda,T = 295):
 		"""Calculates refractive index at given wavelength and
@@ -62,14 +62,15 @@ class Material:
 		elif self.type == "lookup":
 			wavelength = self.model[:,0]
 			index = self.model[:,1]
-			n = Akima1DInterpolator(wavelength,index).__call__(lmbda,nu = 0,extrapolate = True)
+			n = Akima1DInterpolator(wavelength,index).__call__(lmbda,nu = 0,extrapolate = True) # Produce the Akima interpolation and extrapolation for unknow data of the lookup table
 		return n
 
 	def dispersion(self,lmbda1,lmbda2, point = 100):
+		""" Return the dispersion relation between lambda1 and lambda2 on n points"""
 		return dispersion.dispersion(self.index, lmbda1, lmbda2, point = point)
 
 	def groupindex(self,lmbda,T = 295):
-
+		""" Return the group index at lmbda """
 		n0 = self.index(lmbda,T)
 		n1 =self.index(lmbda-0.1,T)
 		n2 = self.index(lmbda+0.1,T)

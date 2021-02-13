@@ -23,7 +23,7 @@ class Spectrum:
 
 		wvl = lmbda + np.linspace(-0.5,0.5,Samples)*bandwidth
 
-		T = np.zeros((Samples,model.No))
+		T = np.zeros((Samples,model.No), dtype = complex)
 
 		
 		# Replacement for the wait bar
