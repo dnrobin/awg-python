@@ -1,6 +1,23 @@
 from .core import *
 
 class SimulationOptions:
+	"""
+	Option set for AWG simulations.
+	
+	OPTIONS:
+	
+	ModeType - aperture mode approximations, one of
+	  'rectangle': rectangle function
+	  'gaussian': spot size gaussian
+	  'solve': 1D effective index method
+	  'full': 2D rigorous FDFD simulation
+	UseMagneticField - use magnetic field in overlap integrals
+	TaperLosses - apply individual taper loss amount in +dB
+	ExtraLosses - apply overall insertion loss bias in +dB
+	PhaseStdError - apply random phase error to each waveguide according to normally distributed noise function with provided standard error
+	CustomInputFunction - provide arbitrary input field distribution instead of automatically generate field from waveguide description
+	"""
+
 	__slots__ = [
 				"ModeType",
 				"UseMagneticField",

@@ -3,11 +3,31 @@ from . import SimulationOptions, Simulate
 from .AWG import *
 
 class Spectrum:
+	"""
+	Simulate entire AWG device over wavelength range and extract transmission
+
+	INPUT:
+
+		model     - AWG system to Simulate
+		lmbda     - center wavelength [μm]
+		bandwidth - badwidth use around the center wavelenght [μm]
+	OPTIONAL :
+		Points  - Number of point to sample over the calculated field (def.250)
+		Samples - Number of point to sample over the bandwidth (def.100)
+		Options - Using some custom simulation options using the SimulationOptions function
+	OUTPUT:
+		None
+	
+	ATTRIBUTE:
+		wavelength   - Array of the wavelegth use for the simulation
+		transmission - Array of transmission for each ouput channel of the AWG at every wavelenght
+
+	"""
 	def __init__(self,model,lmbda,bandwidth,**kwargs):
 		_in = kwargs.keys()
 
-		if "points" in _in:
-			points = kwargs["points"]
+		if "Points" in _in:
+			points = kwargs["Points"]
 		else:
 			points = 250
 		

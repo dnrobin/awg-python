@@ -3,6 +3,9 @@ import numpy as np
 from .Simulate import Simulate
 
 class Analyse:
+	"""
+	Perform analysis on output spectrum.
+	"""
 	def __init__(self,results):
 	
 		lmbda = results.wavelength
