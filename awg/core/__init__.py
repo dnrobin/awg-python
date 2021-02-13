@@ -7,17 +7,25 @@ import scipy as sc
 from scipy.optimize import root
 import cmath
 sys.path.append(os.path.abspath(os.path.join('..')))
-#from material import *
 
 
 
 def clamp(x,a,b):
+	"""
+	Limit x value within [a,b] range
+	"""
 	return min(max(x,a),b)
 
 def step(x): # take only list or arrays
+	"""
+	Unit step function.
+	"""
 	return 1- np.double(x < 0)
 
 def rect(x):
+	"""
+	Return a rectangle function.
+	"""
 	return step(-x+1/2)*step(x+1/2)
 ### length of float and integer are not defined ###
 
@@ -25,6 +33,9 @@ def sinc(x):
 	return min(1,np.sin(x)/(x*np.pi))
 
 def fpower(x,Ex,Hy = [],Ey = [],Hx = []):
+	"""
+	Calculate the field optical power.
+	"""
 	if (len(Ey) != 0) and (len(Hx) != 0):
 		Sz = 1/2 * np.real(Ex*np.conj(Hy)-Ey*np.conj(Hx))
 		P = np.trapz(Sz,x)
@@ -36,6 +47,9 @@ def fpower(x,Ex,Hy = [],Ey = [],Hx = []):
 	return P
 
 def pnorm(x,Ex,Hy = [],Ey = [],Hx = []):
+	"""
+	Normalizes field to unit power/intensity.
+	"""
 	if (len(Ey) != 0) and (len(Hx) != 0):
 
 		P = fpower(x,Ex,Hy,Ey,Hx)
@@ -60,6 +74,13 @@ def pnorm(x,Ex,Hy = [],Ey = [],Hx = []):
 
 
 def mat_prod(a, ma1,ma2):
+	"""
+	Multiplication of multiple dimension array.
+
+	a   - array of final dimension
+	ma1 - first array  (mxn)
+	ma2 - second array (nxn)
+	"""
 	for i in range(len(a)):
 		for j in range(len(a[i])):
 			a[i][j] = ma1[i]*ma2[j]
@@ -67,6 +88,9 @@ def mat_prod(a, ma1,ma2):
 
 
 def list_to_array(lst,dtype = complex):
+	"""
+	Transform Python list to numpy array.
+	"""
 	if (len(lst) > 2) and ((type(lst[0]) == int) or (type(lst[0]) == float)):
 		new_list = np.zeros(len(lst),dtype = dtype)
 		for i,j in enumerate(lst):
@@ -79,33 +103,33 @@ def list_to_array(lst,dtype = complex):
 def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 	""" Slabkwargsdex Guided mode effective index of planar waveguide.
 	
-	 DESCRIPTION:
-	 Solves for the TE (or TM) effective index of a 3-layer slab waveguide
-	           na          y
-	   ^   ----------      |
-	   t       nc          x -- z
-	   v   ----------     
-	           ns
+	DESCRIPTION:
+	Solves for the TE (or TM) effective index of a 3-layer slab waveguide
+	          na          y
+	  ^   ----------      |
+	  t       nc          x -- z
+	  v   ----------     
+	          ns
 	
-	   with propagation in the +z direction
+	  with propagation in the +z direction
 
-	 INPUT:
-	 lambda0 - freespace wavelength
-	 t  - core (guiding layer) thickness
-	 na - cladding index (number|function)
-	 nc - core index (number|function)
-	 ns - substrate index (number|function)
+	INPUT:
+	lambda0 - freespace wavelength
+	t  - core (guiding layer) thickness
+	na - cladding index (number|function)
+	nc - core index (number|function)
+	ns - substrate index (number|function)
 	
-	 OPTIONS:
-	 Modes - max number of modes to solve
-	 Polarisation - one of 'TE' or 'TM'
+	OPTIONS:
+	Modes - max number of modes to solve
+	Polarisation - one of 'TE' or 'TM'
 	
-	 OUTPUT:
+	OUTPUT:
 	
-	 neff - vector of indexes of each supported mode
+	neff - vector of indexes of each supported mode
 	
-	 NOTE: it is possible to provide a function of the form n = @(lambda0) for 
-	 the refractive index which will be called using lambda0."""
+	NOTE: it is possible to provide a function of the form n = lambda lambda0: func(lambda0) for 
+	the refractive index which will be called using lambda0."""
 	
 	neff = []
 
@@ -168,38 +192,38 @@ def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 	"""Slab_mode  Guided mode electromagnetic fields of the planar waveguide.
 	
-	 DESCRIPTION:
-	   solves for the TE (or TM) mode fields of a 3-layer planar waveguide
+	DESCRIPTION:
+	  solves for the TE (or TM) mode fields of a 3-layer planar waveguide
 	
-	           na          y
-	   ^   ----------      |
-	   t       nc          x -- z
-	   v   ----------     
-	           ns
+	          na          y
+	  ^   ----------      |
+	  t       nc          x -- z
+	  v   ----------     
+	          ns
 	
-	   with propagation in the +z direction
+	  with propagation in the +z direction
 
-	 INPUT:
-	 lambda0   - simulation wavelength (freespace)
-	 t         - core (guiding layer) thickness
-	 na        - top cladding index (number|function)
-	 nc        - core layer index (number|function)
-	 ns        - substrate layer index (number|function)
-	 y (optional) - provide the coordinate vector to use
+	INPUT:
+	lambda0   - simulation wavelength (freespace)
+	t         - core (guiding layer) thickness
+	na        - top cladding index (number|function)
+	nc        - core layer index (number|function)
+	ns        - substrate layer index (number|function)
+	y (optional) - provide the coordinate vector to use
 	
-	 OPTIONS:
-	 Modes - max number of modes to solve
-	 Polarisation - one of 'TE' or 'TM'
-	 Limits - coordinate range [min,max] (if y was not provided)
-	 Points - number of coordinate points (if y was not provided)
+	OPTIONS:
+	Modes - max number of modes to solve
+	Polarisation - one of 'TE' or 'TM'
+	Limits - coordinate range [min,max] (if y was not provided)
+	Points - number of coordinate points (if y was not provided)
 	
-	 OUTPUT:
-	 y - coordinate vector
-	 E,H - all x,y,z field components, ex. E(<y>,<m>,<i>), where m is the mode
-	   number, i is the field component index such that 1: x, 2: y, 3:z
+	OUTPUT:
+	y - coordinate vector
+	E,H - all x,y,z field components, ex. E(<y>,<m>,<i>), where m is the mode
+	  number, i is the field component index such that 1: x, 2: y, 3:z
 	
-	 NOTE: it is possible to provide a function of the form n = @(lambda0) for 
-	 the refractive index which will be called using lambda0."""
+	NOTE: it is possible to provide a function of the form n = lambda lambda0: func(lambda0) for 
+	the refractive index which will be called using lambda0."""
 
 	n0 = 120*np.pi
 	
@@ -295,45 +319,45 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 def wgindex(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	"""Effective index method for guided modes in arbitrary waveguide
 	
-	 DESCRIPTION:
-	   solves for the TE (or TM) effective index of an etched waveguide
-	   structure using the effectice index method.
+	DESCRIPTION:
+	  solves for the TE (or TM) effective index of an etched waveguide
+	  structure using the effectice index method.
 	
-	 USAGE:
-	   - get effective index for supported TE-like modes:
-	   neff = eim_index(1.55, 0.5, 0.22, 0.09, 1, 3.47, 1.44)
+	USAGE:
+	  - get effective index for supported TE-like modes:
+	  neff = eim_index(1.55, 0.5, 0.22, 0.09, 1, 3.47, 1.44)
 	
-	              |<   w   >|
-	               _________           _____
-	              |         |            ^
-	  ___    _____|         |_____ 
-	   ^                                 h
-	   t                                  
-	  _v_    _____________________     __v__
+	             |<   w   >|
+	              _________           _____
+	             |         |            ^
+	 ___    _____|         |_____ 
+	  ^                                 h
+	  t                                  
+	 _v_    _____________________     __v__
 	
-	          II  |    I    |  II
+	         II  |    I    |  II
 	
-	 INPUT:
-	 lambda0   - free-space wavelength
-	 w         - core width
-	 h         - slab thickness
-	 t         - slab thickness
-	               t < h  : rib waveguide
-	               t == 0 : rectangular waveguide w x h
-	               t == h : uniform slab of thickness t
-	 na        - (top) oxide cladding layer material index
-	 nc        - (middle) core layer material index
-	 ns        - (bottom) substrate layer material index
+	INPUT:
+	lambda0   - free-space wavelength
+	w         - core width
+	h         - slab thickness
+	t         - slab thickness
+	              t < h  : rib waveguide
+	              t == 0 : rectangular waveguide w x h
+	              t == h : uniform slab of thickness t
+	na        - (top) oxide cladding layer material index
+	nc        - (middle) core layer material index
+	ns        - (bottom) substrate layer material index
 	
-	 OPTIONS:
-	 Modes - number of modes to solve
-	 Polarisation - one of 'TE' or 'TM'
+	OPTIONS:
+	Modes - number of modes to solve
+	Polarisation - one of 'TE' or 'TM'
 	
-	 OUTPUT:
-	 neff - TE (or TM) mode index (array of index if multimode)
+	OUTPUT:
+	neff - TE (or TM) mode index (array of index if multimode)
 	
-	 NOTE: it is possible to provide a function of the form n = material(lambda0) for 
-	 the refraction index which will be called using lambda0. """
+	NOTE: it is possible to provide a function of the form n = lambda lambda0: func(lambda0) for 
+	the refractive index which will be called using lambda0."""
 
 
 	_in = kwargs
@@ -387,44 +411,44 @@ def wgindex(lmbda0,w,h,t,na,nc,ns,**kwargs):
 def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	"""	eim_mode   Solve 2D waveguide cross section by effective index method.
 	
-	 This function solves for the fundamental TE (or TM) mode fields using 
-	 effective index method.
+	This function solves for the fundamental TE (or TM) mode fields using 
+	effective index method.
 	
-	              |<   w   >|
-	               _________           _____
-	              |         |            ^
-	  ___    _____|         |_____ 
-	   ^                                 h
-	   t                                  
-	  _v_    _____________________     __v__
+	             |<   w   >|
+	              _________           _____
+	             |         |            ^
+	 ___    _____|         |_____ 
+	  ^                                 h
+	  t                                  
+	 _v_    _____________________     __v__
 	
-	          II  |    I    |  II
+	         II  |    I    |  II
 	
-	 INPUT:
-	 lambda    - free space wavelength
-	 w         - core width
-	 h         - core thickness
-	 t         - slab thickness
-	               t < h  : rib waveguide
-	               t == 0 : rectangular waveguide w x h
-	               t == h : uniform slab of thickness t
-	 na        - (top) oxide cladding layer index of refraction
-	 nc        - (middle) core layer index of refraction
-	 ns        - (bottom) substrate layer index of refraction
-	 x (optional) - provide the x coordinate vectors
+	INPUT:
+	lambda    - free space wavelength
+	w         - core width
+	h         - core thickness
+	t         - slab thickness
+	              t < h  : rib waveguide
+	              t == 0 : rectangular waveguide w x h
+	              t == h : uniform slab of thickness t
+	na        - (top) oxide cladding layer index of refraction
+	nc        - (middle) core layer index of refraction
+	ns        - (bottom) substrate layer index of refraction
+	x (optional) - provide the x coordinate vectors
 	
-	 OPTIONS:
-	 Polarisation - one of 'TE' or 'TM'
-	 Limits - limits for autogenerated coordinates
-	 Points - number of points for autogenerated coordinates
+	OPTIONS:
+	Polarisation - one of 'TE' or 'TM'
+	Limits - limits for autogenerated coordinates
+	Points - number of points for autogenerated coordinates
 	
-	 OUTPUT:
-	 E, H  - cell array of x, y and z field components such that E = {Ex, Ey, Ez}.
-	 x     - coordinate vector
-	 neff  - effective index of the modes solved
+	OUTPUT:
+	E, H  - cell array of x, y and z field components such that E = {Ex, Ey, Ez}.
+	x     - coordinate vector
+	neff  - effective index of the modes solved
 	
-	 NOTE: it is possible to provide a function of the form n = @(lambda0) for 
-	 the refraction index which will be called using lambda0. """
+	NOTE: it is possible to provide a function of the form n = lambda lambda0: func(lambda0) for 
+	the refractive index which will be called using lambda0."""
 
 	t = clamp(t,0,h)
 
@@ -493,7 +517,6 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 			n_II = na
 
 		[Ek,Hk,_,_] = slabmode(lmbda0,w,n_II,n_I,n_II, Polarisation = "TE")
-		#print(Hk)
 
 		Ey = Ek[:,0,0]
 		Ez = Ek[:,0,2]
@@ -507,43 +530,27 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 
 
 
-# Old version of diffract
-"""def diffract(lmbda0,ui,xi,xf,zf, method = "rayleigh"):
-
-
-	if (type(zf) == int) or (type(zf) == float) or (len(zf) == 1):
-		zf = zf*np.ones(len(xf),dtype = complex)
-	elif len(zf) != len(xf):
-		raise ValueError("Coordinate vectors xf and zf must be the same length.")
-
-	if type(ui) == list:
-		ui = list_to_array(ui)
-	if type(xi) == list:
-		xi = list_to_array(xi)
-	if type(xf) == list:
-		xf = list_to_array(xf)
-
-	k = 2*np.pi/lmbda0
-	uf = np.zeros(len(xf),dtype = complex)
-
-	for i in range(len(xf)):
-
-		r = np.sqrt((xf[i]-xi)**2+zf[i]**2)
-		if method == "rayleigh":
-
-			uf[i] = np.sqrt(k/(2j*np.pi))*np.trapz(ui*zf[i]/r**(3/2)*np.exp(-1j*k*r),xi)
-		
-
-		elif method == "fresnel":
-
-			uf[i] = np.sqrt(1j/(lmbda0*zf[i]))*np.exp(-1j*k*zf[i])*np.trapz(ui*np.exp(-1j*k/(2*zf[i])*(xi-xf[i])**2),xi)
-		
-		else:
-			raise ValueError(f"Unrecognized {method} method.")
-	return uf"""
-
-
 def diffract(lmbda,ui,xi,xf,zf, method = "rs"):
+	"""
+	One dimensional Rayleigh-Sommerfeld diffraction integral calculation.
+	This function numerically solves the Rayleigh-Sommerfeld integral from an
+	input field vector at z=0 to an output coordinate (xf,zf) in the x-z plane.
+	
+	INPUT:
+	
+	  lambda - propagation wavelength
+	  ui - input plane complex amplitude
+	  xi - input plane coordinate vector
+	  xf - output plane coordinate (single or vector of coordinates)
+	  zf - propagation distance between input/output planes
+	
+	OUTPUT:
+	
+	  uf - output plane field amplitude
+	  xf - output plane coordinate (single or vector of coordinates)
+	
+	NOTE: uses retarded phase convention: exp(-1j*k*z)
+	"""
 	if (len(zf) == 1) or (type(zf) == int) or (type(zf) == float):
 		zf = zf*np.ones(len(xf))
 	elif len(zf) != len(xf):
@@ -555,10 +562,26 @@ def diffract(lmbda,ui,xi,xf,zf, method = "rs"):
 		r = np.sqrt((xf[i]-xi)**2+zf[i]**2)
 		if method == "rs":
 			uf[i] = np.sqrt(zf[i]/(2*np.pi))*np.trapz(ui*(1j*k+1/r)*np.exp(-1j*k*r)/r**2,xi)
+		elif method == "fr":
+			uf[i] = np.sqrt(1j/lmbda/zf[i])*np.exp(-1j*k*r*zf[i])*np.trapz(ui*np.exp(-1j*k/2/zf[i]*(xi-xf[i])**2),xi)
 	return uf,xf
 
 
 def overlap(x,u,v,hu = None,hv = None):
+	"""
+	DESCRIPTION:
+	   Computes the overlap integral in 1D with or without the H field.
+	
+	 INPUTS:
+	   x - coordinate vector
+	   u - incident field (electric)
+	   v - outgoing field (electric)
+	   Hu - (optional) corresponding incident magnetic field
+	   Hv - (optional) corresponding outgoing magnetic field
+	   
+	 OUTPUT:
+	   t - Power coupling efficiency
+	"""
 	if (hu == None) and (hv == None):
 		uu = np.trapz(np.conj(u)*u,x)
 		vv = np.trapz(np.conj(v)*v,x)
@@ -578,7 +601,7 @@ def overlap(x,u,v,hu = None,hv = None):
 		return abs(np.real(uv*vu/vv)/np.real(uu))
 
 
-def gmode(lmbda,W,H,nclad,ncore,**kwargs):
+def gmode(lmbda,W,H,nclad,ncore,**kwargs): # Always produce fake TE mode
 	_in = kwargs.keys()
 
 	if "x" in _in:
