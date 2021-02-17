@@ -8,6 +8,30 @@ from . import *
 
 
 def plotfield(X, Y = [], **kwargs):
+	"""
+		PLOTFIELD(X,Y) will plot Y as a function of X such that if Y is a
+	complex quantity, the real part will be plotted to the left y-axis and
+	the imaginary part to the secondary y-axis.
+	
+	PLOTFIELD(F) will plot a Field object according to its configuration.
+	If the field is a scalar field, subplots will be produced for the 
+	electric and/or magnetic fields included. If the field is a vector
+	field, those subplots will be broken up into individual component
+	fields. If the field is two-dimensional, the plots become heat maps
+	with the imaginary part ploted in overlaid contours.
+	
+	PLOTFIELD(__, NAME, VALUE) set options using one or more NAME, VALUE 
+	pairs from the following set:
+	'PlotPhase' - When this option is set, each field plot will show the
+				square of the modulus |U|^2 on the left axis and the phase
+				in radians on the right axis, instead of the real and
+				imaginary parts.
+	'PlotPower' - When this option is set, one more subplot is added to
+				show the field power density (Poynting vector). If the
+				field only contains the electric or magnetic part alone,
+				the plot features the field intensity instead.
+	"""
+
 	_in = kwargs.keys()
 
 	if "PlotPhase" in _in:

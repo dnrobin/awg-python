@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 
 x = Field([1,2,3,4,5],[0,1,2,1,0])
 print(x)
-
+y = AWG()
+print(y)
 """model = AWG(clad = SiO2, core = Si, subs = SiO2, lambda_c = 1.550,
             Ni = 1, No = 9, w = 0.450, h = 0.220, N = 40, m = 75, R = 130,
             d = 2.5, g = 0.4, do = 1.8, wi = 1.5, wo = 1.5, L0 = 20)
