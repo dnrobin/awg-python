@@ -29,11 +29,7 @@ class SimulationOptions:
 	def __init__(self,**kwargs):
 
 		_in  = kwargs.keys()
-		if "ModeType" in _in:
-			self.ModeType = kwargs["ModeType"]
-		else:
-			self.ModeType = "gaussian"
-
+		self.ModeType = kwargs["ModeType"] if "ModeType" in _in else "gaussian"
 		if self.ModeType.lower() not in ['rect','gaussian','solve']:
 			raise ValueError("Mode type must be 'rect','gaussian'or 'solve'.")
 
@@ -41,15 +37,11 @@ class SimulationOptions:
 			self.UseMagneticField = kwargs["UseMagneticField"]
 		else:
 			self.UseMagneticField = False
-		
+
 		if type(self.UseMagneticField) != bool:
 			raise TypeError("UseMagneticField must be a boolean")
 
-		if "InsertionLoss" in _in:
-			self.InsertionLoss = kwargs["InsertionLoss"]
-		else:
-			self.InsertionLoss = 0
-
+		self.InsertionLoss = kwargs["InsertionLoss"] if "InsertionLoss" in _in else 0
 		if self.InsertionLoss < 0:
 			raise ValueError("The insertion loss must be bigger or equal to 0")
 

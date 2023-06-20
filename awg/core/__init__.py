@@ -38,13 +38,12 @@ def fpower(x,Ex,Hy = [],Ey = [],Hx = []):
 	"""
 	if (len(Ey) != 0) and (len(Hx) != 0):
 		Sz = 1/2 * np.real(Ex*np.conj(Hy)-Ey*np.conj(Hx))
-		P = np.trapz(Sz,x)
+		return np.trapz(Sz,x)
 	elif len(Hy) != 0:
 		Sz = np.real(Ex*np.conj(Hy))
-		P = np.trapz(Sz,x)
+		return np.trapz(Sz,x)
 	else:
-		P = np.trapz(np.abs(Ex)**2,x)
-	return P
+		return np.trapz(np.abs(Ex)**2,x)
 
 def pnorm(x,Ex,Hy = [],Ey = [],Hx = []):
 	"""
@@ -69,8 +68,7 @@ def pnorm(x,Ex,Hy = [],Ey = [],Hx = []):
 	else:
 
 		P = fpower(x,Ex)
-		Exnorm = Ex/np.sqrt(P)
-		return Exnorm
+		return Ex/np.sqrt(P)
 
 
 def mat_prod(a, ma1,ma2):
@@ -91,13 +89,12 @@ def list_to_array(lst,dtype = complex):
 	"""
 	Transform Python list to numpy array.
 	"""
-	if (len(lst) > 2) and ((type(lst[0]) == int) or (type(lst[0]) == float)):
-		new_list = np.zeros(len(lst),dtype = dtype)
-		for i,j in enumerate(lst):
-			new_list[i] += j
-		return new_list
-	else:
-		return np.array([i for i in lst])
+	if len(lst) <= 2 or type(lst[0]) not in [int, float]:
+		return np.array(list(lst))
+	new_list = np.zeros(len(lst),dtype = dtype)
+	for i,j in enumerate(lst):
+		new_list[i] += j
+	return new_list
 
 
 def slabindex(lmbda0,t,na,nc,ns,**kwargs):
@@ -136,10 +133,7 @@ def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 	if "Modes" not in kwargs.keys():
 		kwargs["Modes"] = np.inf
 
-	if "Polarisation" in kwargs.keys():
-		if kwargs["Polarisation"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Polarisation" not in kwargs.keys():
 		kwargs["Polarisation"] = "TE"
 
 
@@ -157,35 +151,25 @@ def slabindex(lmbda0,t,na,nc,ns,**kwargs):
 	if kwargs["Polarisation"].upper() == "TE":
 		B1 = lambda a : np.sqrt(((ns/nc)**2 - np.sin(a)**2)+0j)
 		r1 = lambda a : (np.cos(a)-B1(a))/(np.cos(a)+B1(a))
-		
+
 		B2 = lambda a : np.sqrt(((na/nc)**2 - np.sin(a)**2)+0j)
-		r2 = lambda a : (np.cos(a)-B2(a))/(np.cos(a)+B2(a))
-
-		phi1 = lambda a : np.angle(r1(a))
-		phi2 = lambda a : np.angle(r2(a))
-
-		M = math.floor((4*np.pi*t*nc/lmbda0*np.cos(a0)+phi1(a0) + phi2(a0))/(2*np.pi))
-		
-		for m in range(min(kwargs["Modes"],M+1)):
-			a = root(lambda a : 4*np.pi*t*nc/lmbda0*np.cos(a)+phi1(a)+phi2(a)-2*(m)*np.pi,1)
-			neff.append((np.sin(a.x)*nc)[0])
-		return neff
 	else:
 		B1 = lambda a : (nc/ns)**2*np.sqrt(((ns/nc)**2 - np.sin(a)**2)+0j)
 		r1 = lambda a : (np.cos(a)-B1(a))/(np.cos(a)+B1(a))
-		
-		B2 = lambda a : (nc/na)**2*np.sqrt(((na/nc)**2 - np.sin(a)**2)+0j)
-		r2 = lambda a : (np.cos(a)-B2(a))/(np.cos(a)+B2(a))
 
-		phi1 = lambda a : np.angle(r1(a))
-		phi2 = lambda a : np.angle(r2(a))
+		B2 = lambda a : (nc/na)**2*np.sqrt(((na/nc)**2 - np.sin(a)**2)+0j)		
 
-		M = math.floor((4*np.pi*t*nc/lmbda0*np.cos(a0)+phi1(a0) + phi2(a0))/(2*np.pi))
-		
-		for m in range(min(kwargs["Modes"],M+1)):
-			a = root(lambda a : 4*np.pi*t*nc/lmbda0*np.cos(a)+phi1(a)+phi2(a)-2*(m)*np.pi,1)
-			neff.append((np.sin(a.x)*nc)[0])
-		return neff		
+	r2 = lambda a : (np.cos(a)-B2(a))/(np.cos(a)+B2(a))
+
+	phi1 = lambda a : np.angle(r1(a))
+	phi2 = lambda a : np.angle(r2(a))
+
+	M = math.floor((4*np.pi*t*nc/lmbda0*np.cos(a0)+phi1(a0) + phi2(a0))/(2*np.pi))
+
+	for m in range(min(kwargs["Modes"],M+1)):
+		a = root(lambda a : 4*np.pi*t*nc/lmbda0*np.cos(a)+phi1(a)+phi2(a)-2*(m)*np.pi,1)
+		neff.append((np.sin(a.x)*nc)[0])
+	return neff		
 
 
 
@@ -226,17 +210,14 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 	the refractive index which will be called using lambda0."""
 
 	n0 = 120*np.pi
-	
+
 	_in = kwargs
 	if "y" not in _in.keys():
 		_in["y"] = []
 
 	if "Modes" not in kwargs.keys():
 		kwargs["Modes"] = np.inf
-	if "Polarisation" in _in.keys():
-		if _in["Polarisation"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Polarisation" not in _in.keys():
 		_in["Polarisation"] = "TE"
 
 	if "Range" not in _in.keys():
@@ -255,7 +236,7 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 		y = np.linspace(_in["Range"][0],_in["Range"][1],_in["points"])
 	else:
 		y = _in["y"]
-	
+
 
 	i1 = []
 	i2 = []
@@ -276,9 +257,9 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 		p = k0*np.sqrt(neff[m]**2 - ns**2)
 		k = k0*np.sqrt(nc**2 - neff[m]**2)
 		q = k0*np.sqrt(neff[m]**2 - na**2)
-		
+
 		if _in["Polarisation"].upper() == "TE":
-			
+
 			f = 0.5*np.arctan2(k*(p - q),(k**2 + p*q))
 
 			C = np.sqrt(n0/neff[m]/(t + 1/p + 1/q))
@@ -287,7 +268,7 @@ def slabmode(lmbda0,t,na,nc,ns,**kwargs):
 			Em2 = np.cos(k*y[i2] - f)
 			Em3 = np.cos(k*t/2 - f)*np.exp(q*(t/2 - y[i3]))
 			Em = np.concatenate((Em1,Em2,Em3))*C
-			
+
 
 			H[:,m,1] = neff[m]/n0*Em
 			H[:,m,2] = 1j/(k0*n0)*np.concatenate((np.zeros(1),np.diff(Em)))
@@ -364,10 +345,7 @@ def wgindex(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	if "Modes" not in _in.keys():
 		_in["Modes"] = np.inf
 
-	if "Polarisation" in _in.keys():
-		if _in["Polarisation"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Polarisation" not in _in.keys():
 		_in["Polarisation"] = "TE"
 
 	if (type(na) == types.FunctionType) or (str(type(na)) == "<class 'material.Material.Material'>"):
@@ -382,29 +360,23 @@ def wgindex(lmbda0,w,h,t,na,nc,ns,**kwargs):
 	neff_I = slabindex(lmbda0,h,na,nc,ns,Modes = _in["Modes"], Polarisation = _in["Polarisation"])
 
 	if t == h:
-		neff = neff_I
-		return neff
-
+		return neff_I
 	if t > 0:
 		neff_II = slabindex(lmbda0,t,na,nc,ns,Modes = _in["Modes"],Polarisation = _in["Polarisation"])
 	else:
 		neff_II = na
-	
+
 	neff = []
 
 	if _in["Polarisation"].upper() in "TE":
 
 		for m in range(min(len(neff_I),len(neff_II))):
 			n = slabindex(lmbda0,w,neff_II[m],neff_I[m],neff_II[m],Modes = _in["Modes"],Polarisation = "TM")
-			for i in n:
-				if i > max(ns,na):
-					neff.append(i)
+			neff.extend(i for i in n if i > max(ns,na))
 	else:
 		for m in range(min(len(neff_I),len(neff_II))):
 			n = slabindex(lmbda0,w,neff_II[m],neff_I[m],neff_II[m],Modes = _in["Modes"],Polarisation = "TE")
-			for i in n:
-				if i > max(ns,na):
-					neff.append(i)
+			neff.extend(i for i in n if i > max(ns,na))
 	return neff
 
 
@@ -459,22 +431,10 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 			Polarisation = kwargs["Polarisation"]
 	else:
 		Polarisation = "TE"
-	
-	if "XRange" in _in:
-		Xrange = kwargs["XRange"]
-	else:
-		Xrange = [-3*w,3*w]
 
-	if "Points" in _in:
-		Points = kwargs["Points"]
-	else:
-		Points = 100
-
-	if "x" in _in:
-		x = kwargs["x"]
-	else:
-		x = np.linspace(Xrange[0],Xrange[1],Points)
-
+	Xrange = kwargs["XRange"] if "XRange" in _in else [-3*w,3*w]
+	Points = kwargs["Points"] if "Points" in _in else 100
+	x = kwargs["x"] if "x" in _in else np.linspace(Xrange[0],Xrange[1],Points)
 	if (type(na) == types.FunctionType) or (str(type(na)) == "<class 'material.Material.Material'>"):
 		na = na(lmbda0)
 	if (type(nc) == types.FunctionType) or (str(type(nc)) == "<class 'material.Material.Material'>"):
@@ -489,7 +449,7 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 		neff = wgindex(lmbda0,w,h,t,na,nc,ns,Polarisation = "TE",Modes = 1)[0]
 
 		n_I = slabindex(lmbda0,h,na,nc,ns,Polarisation = "TE",Modes = 1)[0]
-		
+
 		if t > 0 :
 			n_II = slabindex(lmbda0,t,na,nc,ns,Polarisation = "TE",Modes = 1)[0]
 		else:
@@ -505,12 +465,12 @@ def wgmode(lmbda0,w,h,t,na,nc,ns,**kwargs):
 
 		E = (Ex,ni1,ni1)
 		H = (ni1,Hy,Hz)
-	
+
 	else:
 		neff = wgindex(lmbda0,w,h,t,na,nc,ns,Polarisation = "TM",Modes = 1)[0]
 
 		n_I = slabindex(lmbda0,h,na,nc,ns,Polarisation = "TM",Modes = 1)[0]
-		
+
 		if t > 0 :
 			n_II = slabindex(lmbda0,t,na,nc,ns,Polarisation = "TM",Modes = 1)[0]
 		else:
@@ -582,16 +542,16 @@ def overlap(x,u,v,hu = None,hv = None):
 	 OUTPUT:
 	   t - Power coupling efficiency
 	"""
-	if (hu == None) and (hv == None):
+	if hu is None and hv is None:
 		uu = np.trapz(np.conj(u)*u,x)
 		vv = np.trapz(np.conj(v)*v,x)
 		uv = np.trapz(np.conj(u)*v,x) 
 
 		return abs(uv)/(np.sqrt(uu)*np.sqrt(vv))
 	else:
-		if hu == None:
+		if hu is None:
 			hu = np.zeros(len(hv),dtype = complex)
-		if hv == None:
+		if hv is None:
 			hv = np.zeros(len(hu),dtype = complex)
 		uu = np.trapz(u[:]*np.conj(hu[:]),x);
 		vv = np.trapz(v*np.conj(hv),x);
@@ -604,26 +564,10 @@ def overlap(x,u,v,hu = None,hv = None):
 def gmode(lmbda,W,H,nclad,ncore,**kwargs): # Always produce fake TE mode
 	_in = kwargs.keys()
 
-	if "x" in _in:
-		x = kwargs["x"]
-	else:
-		x = []
-
-	if "Limits" in _in:
-		Limits = kwargs["Limits"]
-	else:
-		Limits = [-3*W,3*W]
-
-	if "points"in _in:
-		points = kwargs["points"]
-	else:
-		points = 100
-
-	if "VCoef" in _in:
-		VCoef = kwargs["VCoef"]
-	else:
-		VCoef = [0.337,0.650]
-
+	x = kwargs["x"] if "x" in _in else []
+	Limits = kwargs["Limits"] if "Limits" in _in else [-3*W,3*W]
+	points = kwargs["points"] if "points"in _in else 100
+	VCoef = kwargs["VCoef"] if "VCoef" in _in else [0.337,0.650]
 	if len(x) == 0:
 		x = np.linspace(Limits[0],Limits[1], points)
 

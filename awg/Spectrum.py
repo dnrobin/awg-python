@@ -26,26 +26,14 @@ class Spectrum:
 	def __init__(self,model,lmbda,bandwidth,**kwargs):
 		_in = kwargs.keys()
 
-		if "Points" in _in:
-			points = kwargs["Points"]
-		else:
-			points = 250
-		
-		if "Samples" in _in:
-			Samples = kwargs["Samples"]
-		else:
-			Samples = 100
-
-		if "Options" in _in:
-			Options = kwargs["Options"]
-		else:
-			Options = SimulationOptions()
-
+		points = kwargs["Points"] if "Points" in _in else 250
+		Samples = kwargs["Samples"] if "Samples" in _in else 100
+		Options = kwargs["Options"] if "Options" in _in else SimulationOptions()
 		wvl = lmbda + np.linspace(-0.5,0.5,Samples)*bandwidth
 
 		T = np.zeros((Samples,model.No), dtype = complex)
 
-		
+
 		# Replacement for the wait bar
 		for i in range(Samples):
 			R = Simulate(model,wvl[i],Options = Options,points = points)

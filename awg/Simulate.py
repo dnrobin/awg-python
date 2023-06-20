@@ -28,15 +28,8 @@ class Simulate:
 	def __init__(self,model,lmbda,_input = 0,**kwargs):
 
 		_in = kwargs.keys()
-		if "Points" in _in:
-			points = kwargs["Points"]
-		else:
-			points = 250
-		if "Options" in _in:
-			Options = kwargs["Options"]
-		else:
-			Options = SimulationOptions()
-
+		points = kwargs["Points"] if "Points" in _in else 250
+		Options = kwargs["Options"] if "Options" in _in else SimulationOptions()
 		if Options.CustomInputField != []:
 			F_iw = iw(model,lmbda,_input,Options.CustomInputField)
 		else:
