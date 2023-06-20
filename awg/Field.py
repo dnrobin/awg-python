@@ -6,9 +6,9 @@ def DataFormat(D,sz):
 	if len(D) == 0:
 		D = np.zeros(sz, dtype = complex)[0]
 		return D
-	
+
 	shape_D = [1]
-	
+
 	if np.shape(D)[0]> 1:
 		try:
 			shape_D = [len(i) for i in D]
@@ -16,9 +16,9 @@ def DataFormat(D,sz):
 			shape_D.append(len(D))
 	else:
 		shape_D.append(np.shape(D)[0])
-	
+
 	s =[]
-	
+
 	for i in sz:
 		if i > 1:
 			s.append(True)
@@ -28,10 +28,9 @@ def DataFormat(D,sz):
 	if False not in s:
 		if shape_D != sz:
 			raise ValueError("Wrong data format. The field must contain the same number of rows as the y-coordinate points and the same number of columns as the x-coordinate points.")
-		else:
-			if len(D) != max(sz):
-				raise ValueError("Wrong data format. Expecting field data to be the same size as the coordinate elements.")
-	
+		if len(D) != max(sz):
+			raise ValueError("Wrong data format. Expecting field data to be the same size as the coordinate elements.")
+
 	return D
 
 class Field:
@@ -62,7 +61,7 @@ class Field:
 
 		self._y = []
 		self.dimens = 1
-		
+
 		if type(X) == tuple:
 			self._x = X[0]
 
@@ -74,14 +73,14 @@ class Field:
 				if len(self._y) == 0:
 					self.dimens = 1
 
+		elif len(list(np.shape(X))) > 1:
+			raise ValueError("Wrong coordinate format. Must be a 1-D vector.")
 		else:
-			if len([i for i in np.shape(X)]) > 1:
-				raise ValueError("Wrong coordinate format. Must be a 1-D vector.")
 			self._x = X
 
 		if (len(self._x) == 0) and (len(self._y) == 0):
 			raise Error("At least one coordinate vector must be provided.")
-		
+
 		if False in np.isreal(self._x) or False in np.isreal(self._y):
 			raise ValueError("Cordinate vectors must be real numbers.")
 		self.Xdata = np.array([self._x,self._y])
@@ -96,29 +95,14 @@ class Field:
 		if type(E) == tuple:
 			if len(E) > 0:
 				self.scalar = False
-				if self.dimens > 2:
-					self._Ex = E[0]
-				else:
-					self._Ex = np.conj(E[0])
-
+				self._Ex = E[0] if self.dimens > 2 else np.conj(E[0])
 			if len(E) > 1:
-				if self.dimens > 2:
-					self._Ey = E[1]
-				else:
-					self._Ey = np.conj(E[1])
-			
+				self._Ey = E[1] if self.dimens > 2 else np.conj(E[1])
 			if len(E) > 2:
-				if self.dimens > 2:
-					self._Ez = E[2]
-				else:
-					self._Ez = np.conj(E[2])
+				self._Ez = E[2] if self.dimens > 2 else np.conj(E[2])
 		else:
 			self.scalar = True
-			if self.dimens > 2:
-				self._Ex = E
-			else:
-				self._Ex = np.conj(E)
-
+			self._Ex = E if self.dimens > 2 else np.conj(E)
 		self.Edata = (DataFormat(self._Ex,sz),
 					DataFormat(self._Ey,sz),
 					DataFormat(self._Ez,sz))
@@ -140,7 +124,7 @@ class Field:
 
 			if len(H) > 1:
 					self._Hy = H[1]
-			
+
 			if len(H) > 2:
 				self._Hz = H[2]
 		else:
@@ -175,12 +159,11 @@ class Field:
 		"""
 		if self.dimens == 3:
 			return np.trapz(np.trapz(self._y, self.poynting()),self._x)
+		if self.dimens == 1:
+			#print(self.poynting(),self._x)
+			return np.trapz(self.poynting(),self._x)
 		else:
-			if self.dimens == 1:
-				#print(self.poynting(),self._x)
-				return np.trapz(self.poynting(),self._x)
-			else:
-				return np.trapz(self.poynting(),self._y)
+			return np.trapz(self.poynting(),self._y)
 
 
 	def normalize(self,P = 1):
@@ -202,38 +185,32 @@ class Field:
 		"""
 		Look if any electric field is define.
 		"""
-		if np.any([self.Edata]):
-			return True
-		else:
-			return False
+		return bool(np.any([self.Edata]))
 
 	def hasMagnetic(self):
 		"""
 		Look if any magnetic field is define.
 		"""
-		if max([np.any(i) for i in self.Hdata]):
-			return True
-		else:
-			return False
+		return bool(max(np.any(i) for i in self.Hdata))
 
 
 	def getMagnitudeE(self):
 		"""
 		Return the electric field magnitude.
 		"""
-		A = []
-		for i in range(len(self.Edata[0])):
-				A.append(sum([abs(self.Edata[j][i])**2 for j in range(len(self.Edata))])**0.5)
-		return A
+		return [
+			sum(abs(self.Edata[j][i]) ** 2 for j in range(len(self.Edata))) ** 0.5
+			for i in range(len(self.Edata[0]))
+		]
 	
 	def getMagnitudeH(self):
 		"""
 		Return the magnetic field magnitude.
 		"""
-		A = []
-		for i in range(len(self.Hdata[0])):
-				A.append(sum([abs(self.Hdata[j][i])**2 for j in range(len(self.Hdata))])**0.5)
-		return A
+		return [
+			sum(abs(self.Hdata[j][i]) ** 2 for j in range(len(self.Hdata))) ** 0.5
+			for i in range(len(self.Hdata[0]))
+		]
 
 	def isScalar(self):
 		"""
@@ -245,13 +222,13 @@ class Field:
 		"""
 		Look if there is any field dendity over X.
 		"""
-		return (self.dimens == 1) or (self.dimens == 3)
+		return self.dimens in [1, 3]
 
 	def hasY(self):
 		"""
 		Look if there is any field density over Y.
 		"""
-		return (self.dimens == 2) or (self.dimens == 3)
+		return self.dimens in [2, 3]
 
 	def isBidimensional(self):
 		"""
@@ -279,15 +256,8 @@ class Field:
 		return self
 
 	def __str__(self):
-		if self.hasX():
-			x = f"[{self.Xdata[0][0]},...,{self.Xdata[0][-1]}]"
-		else:
-			x = "None"
-		if self.hasY():
-			y = f"[{self.Xdata[1][0]},...,{self.Xdata[1][-1]}]"
-		else:
-			y = "None"
-
+		x = f"[{self.Xdata[0][0]},...,{self.Xdata[0][-1]}]" if self.hasX() else "None"
+		y = f"[{self.Xdata[1][0]},...,{self.Xdata[1][-1]}]" if self.hasY() else "None"
 		return tabulate([['X', x, "X values"], ['Y', y, "Y values"], 
 					['E', self.E.shape, "Electrical field shape"],['H', self.H.shape, "Magnetic field shape"]], headers=['parameters', 'Value', 'definition'])
 
@@ -306,10 +276,7 @@ class Field:
 	
 	@property
 	def E(self):
-		if self.isScalar:
-			return self.Edata[0]
-		else:
-			return self.Edata
+		return self.Edata[0] if self.isScalar else self.Edata
 
 	@property
 	def Ex(self):
@@ -325,10 +292,7 @@ class Field:
 
 	@property
 	def H(self):
-		if self.isScalar:
-			return self.Hdata[0]
-		else:
-			return self.Hdata
+		return self.Hdata[0] if self.isScalar else self.Hdata
 
 	@property
 	def Hx(self):

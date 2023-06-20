@@ -75,7 +75,7 @@ class AWG:
         _in = kwargs.keys()
 
         if "lambda_c" in _in:
-            if ((type(kwargs["lambda_c"]) == float) or (type(kwargs["lambda_c"]) == int)) and (kwargs["lambda_c"] > 0):
+            if type(kwargs["lambda_c"]) in [float, int] and kwargs["lambda_c"] > 0:
                 self._lambda_c = kwargs["lambda_c"]
             else:
                 raise ValueError("The central wavelength [um] must be a positive float or integer.")
@@ -83,7 +83,7 @@ class AWG:
             self._lambda_c = 1.550
 
         if "clad" in _in:
-            if (type(kwargs["clad"]) == types.FunctionType) or (type(kwargs["clad"]) == float) or (type(kwargs["clad"]) == int):
+            if type(kwargs["clad"]) in [types.FunctionType, float, int]:
                 self._clad = Material(kwargs["clad"])
             elif (str(type(kwargs["clad"])) == "<class 'awg.material.Material.Material'>"):
                 self._clad = kwargs["clad"]
@@ -97,7 +97,7 @@ class AWG:
             self._clad = Material(SiO2)
 
         if "core" in _in:
-            if (type(kwargs["core"]) == types.FunctionType) or (type(kwargs["core"]) == float) or (type(kwargs["core"]) == int):
+            if type(kwargs["core"]) in [types.FunctionType, float, int]:
                 self._core = Material(kwargs["core"])
             elif (str(type(kwargs["core"])) == "<class 'awg.material.Material.Material'>"):
                 self._core = kwargs["core"]
@@ -112,7 +112,7 @@ class AWG:
 
 
         if "subs" in _in:
-            if (type(kwargs["subs"]) == types.FunctionType) or (type(kwargs["subs"]) == float) or (type(kwargs["subs"]) == int):
+            if type(kwargs["subs"]) in [types.FunctionType, float, int]:
                 self._subs = Material(kwargs["subs"])
             elif (str(type(kwargs["subs"])) == "<class 'awg.material.Material.Material'>"):
                 self._subs = kwargs["subs"]
@@ -126,7 +126,7 @@ class AWG:
             self._subs = Material(SiO2)
 
         if "w" in _in:
-            if ((type(kwargs["w"]) == int) or (type(kwargs["w"]) == float)) and (kwargs["w"] > 0):
+            if type(kwargs["w"]) in [int, float] and kwargs["w"] > 0:
                 self._w = kwargs["w"]
             else: 
                 raise ValueError("The array waveguide core width 'w' [um] must be positive and be a float or an integer.")
@@ -134,15 +134,15 @@ class AWG:
             self._w = 0.450
 
         if "h" in _in:
-            if ((type(kwargs["h"]) == int) or (type(kwargs["h"]) == float)) and (kwargs["h"] > 0):
+            if type(kwargs["h"]) in [int, float] and kwargs["h"] > 0:
                 self._h = kwargs["h"]
             else: 
                 raise ValueError("The array waveguide core height 'h' [um] must be positive and be a float or an integer.")
         else:
             self._h = 0.220
-        
+
         if "t" in _in:
-            if ((type(kwargs["t"]) == int) or (type(kwargs["t"]) == float)) and (kwargs["t"] >= 0):
+            if type(kwargs["t"]) in [int, float] and kwargs["t"] >= 0:
                 self._t = kwargs["t"]
             else: 
                 raise ValueError("The array waveguide slab thickness 't' (for rib waveguides) [um] must be non-negative and be a float or an integer.")
@@ -158,7 +158,7 @@ class AWG:
             self._N = 40
 
         if "m" in _in:
-            if ((type(kwargs["m"]) == int) or (type(kwargs["m"]) == float)) and (kwargs["m"] > 0):
+            if type(kwargs["m"]) in [int, float] and kwargs["m"] > 0:
                 self._m = kwargs["m"]
             else: 
                 raise ValueError("The order of diffraction 'm' must be a positive integer.")
@@ -166,7 +166,7 @@ class AWG:
             self._m = 30
 
         if "R" in _in:
-            if ((type(kwargs["R"]) == int) or (type(kwargs["R"]) == float)) and (kwargs["R"] > 0):
+            if type(kwargs["R"]) in [int, float] and kwargs["R"] > 0:
                 self._R = kwargs["R"]
             else:
                 raise ValueError("The grating radius of curvature (focal length) 'R' [um] must be a positive float or integer")
@@ -174,7 +174,7 @@ class AWG:
             self._R = 100
 
         if "d" in _in:
-            if ((type(kwargs["d"]) == int) or (type(kwargs["d"]) == float)) and (kwargs["d"] > 0):
+            if type(kwargs["d"]) in [int, float] and kwargs["d"] > 0:
                 self._d = kwargs["d"]
             else:
                 raise ValueError("The array aperture spacing 'd' [um] must be a positive float or integer")
@@ -182,7 +182,7 @@ class AWG:
             self._d = 1.3
 
         if "g" in _in:
-            if ((type(kwargs["g"]) == int) or (type(kwargs["g"]) == float)) and (kwargs["g"] > 0):
+            if type(kwargs["g"]) in [int, float] and kwargs["g"] > 0:
                 self._g = kwargs["g"]
             else:
                 raise ValueError("The gap width between array aperture 'g' [um] must be a positive float or integer")
@@ -190,7 +190,7 @@ class AWG:
             self._g = 0.2
 
         if "L0" in _in:
-            if ((type(kwargs["L0"]) == int) or (type(kwargs["L0"]) == float)) and (kwargs["L0"] >= 0):
+            if type(kwargs["L0"]) in [int, float] and kwargs["L0"] >= 0:
                 self._L0 = kwargs["L0"]
             else:
                 raise ValueError("The minimum lenght offset 'L0' [um] must be a non-negative float or integer")
@@ -206,7 +206,7 @@ class AWG:
             self._Ni = 1
 
         if "wi" in _in:
-            if ((type(kwargs["wi"]) == int) or (type(kwargs["wi"]) == float)) and (kwargs["wi"] > 0):
+            if type(kwargs["wi"]) in [int, float] and kwargs["wi"] > 0:
                 self._wi = kwargs["wi"]
             else:
                 raise ValueError("The input waveguide aperture width 'wi' [um] must be a positive float or integer")
@@ -214,7 +214,7 @@ class AWG:
             self._wi = 1
 
         if "di" in _in:
-            if ((type(kwargs["di"]) == int) or (type(kwargs["di"]) == float)) and (kwargs["di"] > 0):
+            if type(kwargs["di"]) in [int, float] and kwargs["di"] > 0:
                 self._di = kwargs["di"]
             else:
                 raise ValueError("The input waveguide spacing 'di' [um] must be a positive float or integer")
@@ -222,7 +222,7 @@ class AWG:
             self._di = 0
 
         if "li" in _in:
-            if ((type(kwargs["li"]) == int) or (type(kwargs["li"]) == float)) and (kwargs["li"] >= 0):
+            if type(kwargs["li"]) in [int, float] and kwargs["li"] >= 0:
                 self._li = kwargs["li"]
             else:
                 raise ValueError("The input waveguide offset spacing 'li' [um] must be a non-negative float or integer")
@@ -238,7 +238,7 @@ class AWG:
             self._No = 1
 
         if "wo" in _in:
-            if ((type(kwargs["wo"]) == int) or (type(kwargs["wo"]) == float)) and (kwargs["wo"] > 0):
+            if type(kwargs["wo"]) in [int, float] and kwargs["wo"] > 0:
                 self._wo = kwargs["wo"]
             else:
                 raise ValueError("The output waveguide aperture width 'wo' [um] must be a positive float or integer")
@@ -246,7 +246,7 @@ class AWG:
             self._wo = 1
 
         if "do" in _in:
-            if ((type(kwargs["do"]) == int) or (type(kwargs["do"]) == float)) and (kwargs["do"] > 0):
+            if type(kwargs["do"]) in [int, float] and kwargs["do"] > 0:
                 self._do = kwargs["do"]
             else:
                 raise ValueError("The output waveguide spacing 'do' [um] must be a positive float or integer")
@@ -254,7 +254,7 @@ class AWG:
             self._do = 0
 
         if "lo" in _in:
-            if ((type(kwargs["lo"]) == int) or (type(kwargs["lo"]) == float)) and (kwargs["lo"] >= 0):
+            if type(kwargs["lo"]) in [int, float] and kwargs["lo"] >= 0:
                 self._lo = kwargs["lo"]
             else:
                 raise ValueError("The output waveguide offset spacing 'lo' [um] must be a non-negative float or integer")
@@ -270,7 +270,7 @@ class AWG:
             self._confocal = False
 
         if "defocus" in _in:
-            if ((type(kwargs["defocus"]) == int) or (type(kwargs["defocus"]) == float)) and (kwargs["defocus"] > 0):
+            if type(kwargs["defocus"]) in [int, float] and kwargs["defocus"] > 0:
                 self._defocus = kwargs["defocus"]
             else:
                 raise ValueError("The radial defocus must be a positive float or integer")
@@ -278,7 +278,7 @@ class AWG:
             self._defocus = 0
 
         if "wa" in _in:
-            if ((type(kwargs["wa"]) == int) or (type(kwargs["wa"]) == float)) and (kwargs["wa"] > 0):
+            if type(kwargs["wa"]) in [int, float] and kwargs["wa"] > 0:
                 self._wa = kwargs["wa"]
             else:
                 raise ValueError("The waveguide aperture width 'wa' [um] must be a positive float or integer")
@@ -447,8 +447,8 @@ class AWG:
 
     @w.setter
     def w(self,w):
-        if ((type(w) == int) or (type(w) == float)) and (w > 0):
-            self._w = w 
+        if type(w) in [int, float] and w > 0:
+            self._w = w
         else:
             raise ValueError("The array waveguide core width 'w' [um] must be positive and be a float or an integer.")
 
@@ -458,8 +458,8 @@ class AWG:
 
     @h.setter
     def h(self,h):
-        if ((type(h) == int) or (type(h) == float)) and (h > 0):
-            self._h = h 
+        if type(h) in [int, float] and h > 0:
+            self._h = h
         else:
             raise ValueError("The array waveguide core height 'h' [um] must be positive and be a float or an integer.")
 
@@ -469,8 +469,8 @@ class AWG:
 
     @t.setter
     def t(self,t):
-        if ((type(t) == int) or (type(t) == float)) and (t >= 0):
-            self._t = t 
+        if type(t) in [int, float] and t >= 0:
+            self._t = t
         else:
             raise ValueError("The array waveguide slab thickness 't' (for rib waveguides) [um] must be non-negative and be a float or an integer.")
 
@@ -491,8 +491,8 @@ class AWG:
 
     @m.setter
     def m(self,m):
-        if ((type(m) == int) or (type(m) == float)) and (m > 0):
-            self._m = m 
+        if type(m) in [int, float] and m > 0:
+            self._m = m
         else:
             raise ValueError("The order of diffraction 'm' must be a positive integer.")
     
@@ -502,8 +502,8 @@ class AWG:
 
     @R.setter
     def R(self,R):
-        if ((type(R) == int) or (type(R) == float)) and (R > 0):
-           self._R = R 
+        if type(R) in [int, float] and R > 0:
+            self._R = R
         else:
             raise ValueError("The grating radius of curvature (focal length) 'R' [um] must be a positive float or integer")
 
@@ -513,8 +513,8 @@ class AWG:
 
     @d.setter
     def d(self,d):
-        if ((type(d) == int) or (type(d) == float)) and (d > 0):
-           self._d = d 
+        if type(d) in [int, float] and d > 0:
+            self._d = d
         else:
             raise ValueError("The array aperture spacing 'd' [um] must be a positive float or integer")
 
@@ -524,8 +524,8 @@ class AWG:
 
     @g.setter
     def g(self,g):
-        if ((type(g) == int) or (type(g) == float)) and (g > 0):
-           self._g = g 
+        if type(g) in [int, float] and g > 0:
+            self._g = g
         else:
             raise ValueError("The gap width between array aperture 'g' [um] must be a positive float or integer")
     
@@ -557,8 +557,8 @@ class AWG:
 
     @wi.setter
     def wi(self,wi):
-        if ((type(wi) == int) or (type(wi) == float)) and (wi > 0):
-           self._wi = wi
+        if type(wi) in [int, float] and wi > 0:
+            self._wi = wi
         else:
             raise ValueError("The input waveguide aperture width 'wi' [um] must be a positive float or integer")
 
@@ -568,8 +568,8 @@ class AWG:
 
     @di.setter
     def di(self,di):
-        if ((type(di) == int) or (type(di) == float)) and (di > 0):
-           self._di = di 
+        if type(di) in [int, float] and di > 0:
+            self._di = di
         else:
             raise ValueError("The input waveguide spacing 'di' [um] must be a positive float or integer")
 
@@ -579,8 +579,8 @@ class AWG:
 
     @li.setter
     def li(self,li):
-        if ((type(li) == int) or (type(li) == float)) and (li >= 0):
-           self._li = li 
+        if type(li) in [int, float] and li >= 0:
+            self._li = li
         else:
             raise ValueError("The input waveguide offset spacing 'li' [um] must be a non-negative float or integer")
 
@@ -601,8 +601,8 @@ class AWG:
 
     @wo.setter
     def wo(self,wo):
-        if ((type(wo) == int) or (type(wo) == float)) and (wo > 0):
-           self._wo = wo
+        if type(wo) in [int, float] and wo > 0:
+            self._wo = wo
         else:
             raise ValueError("The output waveguide aperture width 'wo' [um] must be a positive float or integer")
 
@@ -612,8 +612,8 @@ class AWG:
 
     @do.setter
     def do(self,do):
-        if ((type(do) == int) or (type(do) == float)) and (do > 0):
-           self._do = do 
+        if type(do) in [int, float] and do > 0:
+            self._do = do
         else:
             raise ValueError("The output waveguide spacing 'do' [um] must be a positive float or integer")
 
@@ -623,8 +623,8 @@ class AWG:
 
     @lo.setter
     def lo(self,lo):
-        if ((type(lo) == int) or (type(lo) == float)) and (lo >= 0):
-           self._lo = lo 
+        if type(lo) in [int, float] and lo >= 0:
+            self._lo = lo
         else:
             raise ValueError("The output waveguide offset spacing 'lo' [um] must be a non-negative float or integer")
 
@@ -647,7 +647,7 @@ class AWG:
     
     @defocus.setter
     def defocus(self,defocus):
-        if ((type(defocus) == int) or (type(defocus) == float)) and (defocus > 0):
+        if type(defocus) in [int, float] and defocus > 0:
             self._defocus = defocus
         else:
             raise ValueError("The defocus or R must be a positive float or integer")
@@ -660,7 +660,7 @@ class AWG:
 
     @wa.setter
     def wa(self,wa):
-        if ((type(wa) == int) or (type(wa) == float)) and (wa > 0):
+        if type(wa) in [int, float] and wa > 0:
             self._wa = wa
         else:
             raise ValueError("The waveguide aperture width 'wa' [um] must be a positive float or integer")
@@ -671,7 +671,7 @@ class AWG:
 
     @dl.setter
     def dl(self,dl):
-        if ((type(dl) == int) or (type(dl) == float)) and (dl > 0):
+        if type(dl) in [int, float] and dl > 0:
             self._dl = dl
         else:
             raise ValueError("The arrayed waveguide lenght increment 'dl' must be a positive float or integer")
@@ -702,19 +702,11 @@ def iw(model, lmbda, _input = 0, u = np.array([]),**kwargs):
 
     _in = kwargs.keys()
 
-    if "ModeType" in _in:
-        ModeType = kwargs["ModeType"]
-    else:
-        ModeType = "gaussian"
-
+    ModeType = kwargs["ModeType"] if "ModeType" in _in else "gaussian"
     if ModeType not in ["rect","gaussian", "solve"]:
         raise ValueError(f"Wrong mode type {ModeType}.")
 
-    if "points" in _in:
-        points = kwargs["points"]
-    else:
-        points = 100
-
+    points = kwargs["points"] if "points" in _in else 100
     if str(type(u)) == "<class 'awg.Field.Field'>":
         F = u
     elif len(u) == 0:
@@ -747,21 +739,9 @@ def fpr1(model,lmbda,F0,**kwargs):
     """
     _in =kwargs.keys()
 
-    if "x" in _in:
-        x = kwargs["x"]
-    else:
-        x = []
-
-    if "Input" in _in:
-        _input = kwargs["Input"]
-    else:
-        _input = 0
-
-    if "points" in _in:
-        points = kwargs["points"]
-    else:
-        points = 250
-
+    x = kwargs["x"] if "x" in _in else []
+    _input = kwargs["Input"] if "Input" in _in else 0
+    points = kwargs["points"] if "points" in _in else 250
     xi = F0.x
     ui = F0.Ex
     ns = model.getSlabWaveguide().index(lmbda,1)[0]
@@ -809,29 +789,13 @@ def aw(model,lmbda,F0,**kwargs):
     """
     _in = kwargs.keys()
 
-    if "ModeType" in _in:
-        ModeType = kwargs["ModeType"]
-    else:
-        ModeType = "gaussian"
-
+    ModeType = kwargs["ModeType"] if "ModeType" in _in else "gaussian"
     if ModeType.lower() not in ["rect","gaussian", "solve"]:
         raise ValueError(f"Wrong mode type {ModeType}.")
 
-    if "PhaseErrorVar" in _in: 
-        PhaseErrorVar = kwargs["PhaseErrorVar"]
-    else:
-        PhaseErrorVar = 0
-
-    if "InsertionLoss" in _in:
-        InsertionLoss = kwargs["InsertionLoss"] # Insertion Loss in dB
-    else:
-        InsertionLoss = 0
-
-    if "PropagationLoss" in _in:
-        PropagationLoss = kwargs["PropagationLoss"]
-    else:
-        PropagationLoss = 0
-
+    PhaseErrorVar = kwargs["PhaseErrorVar"] if "PhaseErrorVar" in _in else 0
+    InsertionLoss = kwargs["InsertionLoss"] if "InsertionLoss" in _in else 0
+    PropagationLoss = kwargs["PropagationLoss"] if "PropagationLoss" in _in else 0
     x0 = F0.x
     u0 = F0.Ex
     P0 = F0.power()
@@ -841,7 +805,7 @@ def aw(model,lmbda,F0,**kwargs):
 
     pnoise = randn(1,model.N)[0]*np.sqrt(PhaseErrorVar)
     iloss = 10**(-abs(InsertionLoss)/10)
-    
+
     Aperture = model.getArrayAperture()
 
     Ex = np.zeros(len(F0.E))
@@ -888,17 +852,9 @@ def fpr2(model,lmbda,F0,**kwargs):
         Field at the end of the second fpr
     """
     _in  = kwargs.keys()
-    
-    if "x" in _in:
-        x = kwargs["x"]
-    else:
-        x = []
 
-    if "points" in _in:
-        points = kwargs["points"]
-    else:
-        points = 250
-
+    x = kwargs["x"] if "x" in _in else []
+    points = kwargs["points"] if "points" in _in else 250
     x0 = F0.x
     u0 = F0.Ex
 
@@ -909,12 +865,7 @@ def fpr2(model,lmbda,F0,**kwargs):
     if model.confocal:
         r = R
 
-    if len(x) == 0:
-        sf = np.linspace(-np.pi/2,np.pi/2,points)*r
-    else:
-        sf = x
-
-
+    sf = np.linspace(-np.pi/2,np.pi/2,points)*r if len(x) == 0 else x
     a = x0/R
     xp = R*np.tan(a)
     dp = R*(1/np.cos(a))-R
@@ -944,11 +895,7 @@ def ow(model,lmbda,F0,**kwargs):
         Power transmission for each output waveguide.
     """
 
-    if "ModeType" in kwargs.keys():
-        ModeType = kwargs["ModeType"]
-    else:
-        ModeType = "gaussian"
-
+    ModeType = kwargs.get("ModeType", "gaussian")
     if ModeType.lower() not in ["rect","gaussian", "solve"]:
         raise ValueError(f"Wrong mode type {ModeType}.")
 

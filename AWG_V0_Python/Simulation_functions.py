@@ -22,85 +22,85 @@ class AWG_obj:
 		_in = inspect.getmembers(self)[26:-1]
 		_in = [_in[i][0] for i in range(len(_in))]
 		for i in range(len(_in)):
-				if _in[i] == "clad":
-					if (type(self.clad) == types.FunctionType) or (type(self.clad) == float) or (type(self.clad) == int):
-						self.clad = _in[i]
-					else:
-						raise ValueError("The cladding must be a material or a float representing its refractive index.")
-				elif _in[i] == "core":
-					if (type(self.core) == types.FunctionType) or (type(self.core) == float) or (type(self.core) == int):
-						self.core = _in[i]
-					else:
-						raise ValueError("The core must be a material or a float representing its refractive index.")
-				elif _in[i] == "subs":
-					if (type(self.subs) == types.FunctionType) or (type(self.subs) == float) or (type(self.subs) == int):
-						self.subs = _in[i]
-					else:
-						raise ValueError("The substrate must be a material or a float representing its refractive index.")
-				elif _in[i] == "lambda_c":
-					if (type(self.lambda_c) == float) or (type(self.lambda_c) == int):
-						self.lambda_c = _in[i]
-					else:
-						raise ValueError("The central wavelength [um] must be a float or an integer.")			
-				elif _in[i] == "w" :
-					if (type(self.w) == float) or (type(self.w) == int):
-						self.w = _in[i]
-					else:
-						raise ValueError("The array waveguide core width [um] must be a float or an integer.")	
-				elif _in[i] == "h" :
-					if (type(self.h) == float) or (type(self.h) == int):
-						self.h = _in[i]
-					else:
-						raise ValueError("The array waveguide core height [um] must be a float or an integer.")	
-				elif _in[i] == "N":
-					if  type(self.N) == int:
-						self.N = _in[i]
-					else:
-						raise ValueError("The number of output must be an integer.")	
-				elif _in[i] == "M" :
-					if type(self.M) == int:
-						self.M = _in[i]
-					else:
-						raise ValueError("The number of arrayed waveguide must be an integer.")	
-				elif _in[i] == "m" :
-					if type(self.m) == int:
-						self.m = _in[i]
-					else:
-						raise ValueError("The number of arrayed waveguide must be an integer.")	
-				elif _in[i] == "R":
-					if (type(self.R) == float) or (type(self.R) == int):
-						self.R = _in[i]
-					else:
-						raise ValueError("The focal length must be a float or an integer.")
-				elif _in[i] == "d" :
-					if (type(self.d) == float) or (type(self.d) == int):
-						self.d = _in[i]
-					else:
-						raise ValueError("The arrayed waveguide spacing [um] must be float or an integer.")	
-				elif _in[i] == "do" :
-					if (type(self.do) == float) or (type(self.do) == int):
-						self.do = _in[i]
-					else:
-						raise ValueError("The output waveguide spacing [um] must be float or an integer.")		
-				elif _in[i] == "wi":
-					if (type(self.wi) == float) or (type(self.wi) == int):
-						self.wi = _in[i]
-					else:
-						raise ValueError("The input aperture width [um] be a float or an integer.")
-				elif _in[i] == "wg" :
-					if (type(self.wg) == float) or (type(self.wg) == int):
-						self.wg = _in[i]
-					else:
-						raise ValueError("The arrayed aperture width [um] must be float or an integer.")	
-				elif _in[i] == "wo" :
-					if (type(self.wo) == float) or (type(self.wo) == int):
-						self.wo = _in[i]
-					else:
-						raise ValueError("The output aperture width [um] must be float or an integer.")
-				elif _in[i] == "verification":
-					pass
+			if _in[i] == "verification":
+				continue
+			if _in[i] == "clad":
+				if type(self.clad) in [types.FunctionType, float, int]:
+					self.clad = _in[i]
 				else:
-					raise KeyError(f"{i} is not defined by the AWG parameters.")
+					raise ValueError("The cladding must be a material or a float representing its refractive index.")
+			elif _in[i] == "core":
+				if type(self.core) in [types.FunctionType, float, int]:
+					self.core = _in[i]
+				else:
+					raise ValueError("The core must be a material or a float representing its refractive index.")
+			elif _in[i] == "subs":
+				if type(self.subs) in [types.FunctionType, float, int]:
+					self.subs = _in[i]
+				else:
+					raise ValueError("The substrate must be a material or a float representing its refractive index.")
+			elif _in[i] == "lambda_c":
+				if type(self.lambda_c) in [float, int]:
+					self.lambda_c = _in[i]
+				else:
+					raise ValueError("The central wavelength [um] must be a float or an integer.")
+			elif _in[i] == "w":
+				if type(self.w) in [float, int]:
+					self.w = _in[i]
+				else:
+					raise ValueError("The array waveguide core width [um] must be a float or an integer.")
+			elif _in[i] == "h":
+				if type(self.h) in [float, int]:
+					self.h = _in[i]
+				else:
+					raise ValueError("The array waveguide core height [um] must be a float or an integer.")
+			elif _in[i] == "N":
+				if  type(self.N) == int:
+					self.N = _in[i]
+				else:
+					raise ValueError("The number of output must be an integer.")
+			elif _in[i] == "M" :
+				if type(self.M) == int:
+					self.M = _in[i]
+				else:
+					raise ValueError("The number of arrayed waveguide must be an integer.")
+			elif _in[i] == "m" :
+				if type(self.m) == int:
+					self.m = _in[i]
+				else:
+					raise ValueError("The number of arrayed waveguide must be an integer.")
+			elif _in[i] == "R":
+				if type(self.R) in [float, int]:
+					self.R = _in[i]
+				else:
+					raise ValueError("The focal length must be a float or an integer.")
+			elif _in[i] == "d":
+				if type(self.d) in [float, int]:
+					self.d = _in[i]
+				else:
+					raise ValueError("The arrayed waveguide spacing [um] must be float or an integer.")
+			elif _in[i] == "do":
+				if type(self.do) in [float, int]:
+					self.do = _in[i]
+				else:
+					raise ValueError("The output waveguide spacing [um] must be float or an integer.")
+			elif _in[i] == "wi":
+				if type(self.wi) in [float, int]:
+					self.wi = _in[i]
+				else:
+					raise ValueError("The input aperture width [um] be a float or an integer.")
+			elif _in[i] == "wg":
+				if type(self.wg) in [float, int]:
+					self.wg = _in[i]
+				else:
+					raise ValueError("The arrayed aperture width [um] must be float or an integer.")
+			elif _in[i] == "wo":
+				if type(self.wo) in [float, int]:
+					self.wo = _in[i]
+				else:
+					raise ValueError("The output aperture width [um] must be float or an integer.")
+			else:
+				raise KeyError(f"{i} is not defined by the AWG parameters.")
 
 
 
@@ -138,27 +138,16 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		pp["gaussian"] = False
 
 
-	if type(AWG.clad) == types.FunctionType:
-		nclad = AWG.clad(lmbda0)
-	else:
-		nclad = AWG.clad
-	
-	if type(AWG.core) == types.FunctionType:
-		ncore = AWG.core(lmbda0)
-	else:
-		ncore = AWG.core
-	
-	if type(AWG.subs) == types.FunctionType:
-		nsubs = AWG.subs(lmbda0)
-	else:
-		nsubs = AWG.subs
+	nclad = AWG.clad(lmbda0) if type(AWG.clad) == types.FunctionType else AWG.clad
+	ncore = AWG.core(lmbda0) if type(AWG.core) == types.FunctionType else AWG.core
+	nsubs = AWG.subs(lmbda0) if type(AWG.subs) == types.FunctionType else AWG.subs
 	nc = eim_index(lmbda0, AWG.w, AWG.h, np.inf, nsubs, ncore, nsubs, N = 1)[0]
 
 	ns = slab_index(lmbda0, AWG.h, nclad, ncore, nsubs, N = 1)
 
 	dl = AWG.m * AWG.lambda_c / eim_index(AWG.lambda_c, AWG.w, AWG.h, np.inf, nsubs, ncore, nsubs, N = 1)[0]
 	def aperture_mode(lmbda0,w,h,e,x):
-		
+
 		if pp["gaussian"]:
 			V = 2*np.pi/lmbda0 * w * np.sqrt(ncore**2-nclad**2)
 			w_mode = w*(0.5+1/(V-0.6))
@@ -172,7 +161,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 			#print(E)
 			E = E/np.sqrt(trapz(abs(E)**2,x))
 		return E
-	
+
 	def iw_function(lmbda0):
 		s = np.linspace(-0.5, 0.5, pp["sample"],dtype = complex)*(2*AWG.wi)
 		E = aperture_mode(lmbda0, AWG.wi, AWG.h, np.inf, s)
@@ -232,7 +221,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax.set_title(f"Input Mode Field (\u03BB = {lmbda0*1e3:.0f} nm)")
 		ax.set_ylim(min(E0),max(E0))
 		ax.set_xlim(min(s0),max(s0))
-		
+
 		fig,ax1 = plt.subplots()
 		ax1.plot(s1,abs(E1),color = "b", linewidth = 2)
 		ax1.set_ylabel("|E$_x$|")
@@ -244,7 +233,7 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax2.set_ylim(min(np.angle(E1)/np.pi),max(np.angle(E1)/np.pi))
 		ax2.plot(s1,np.angle(E1)/np.pi, color = "r", linewidth = 2)
 		ax2.set_ylabel("$\\phi/\\pi$")
-		
+
 
 		fig,ax3 = plt.subplots()
 		ax3.plot(s2,abs(E2), color = "b", linewidth = 2)
@@ -270,9 +259,9 @@ def AWG_simulate(AWG,lmbda0,**kwargs):
 		ax6.plot(x3, np.angle(E3)/np.pi, color = "r", linewidth = 2)
 		ax6.set_ylabel("$\\phi/\\pi$")
 		ax6.set_ylim(min(np.angle(E3)/np.pi),max(np.angle(E3)/np.pi))
-		
+
 		fig,ax7 = plt.subplots()
-		ax7.bar([i for i in range(1,AWG.N+1)],T, color = "b")
+		ax7.bar(list(range(1,AWG.N+1)), T, color = "b")
 		ax7.set_xlim(0,AWG.N+1)
 		ax7.set_title(f"Output transmission ($\\lambda$ = {lmbda0*1e3:.0f} nm)")
 		ax7.set_ylim(0,1)
@@ -319,37 +308,37 @@ def AWG_analyse(lmbda,T):
 	center_channel = int(np.floor(num_channels/2))
 
 	# Insertion loss
-	
+
 	IL = abs(max(TdB[:,center_channel]))
-	
+
 	# Non-uniformity
-	
+
 	NU = abs(max(TdB[:,0])) - IL
-	
+
 	# 10dB bandwidth
 	t0 = TdB[:,center_channel]
 
 	ic = np.argwhere(t0 == max(t0))[0][0]
 
-	ia10 = np.argwhere(t0[0:ic] < -10)[-1][0]
+	ia10 = np.argwhere(t0[:ic] < -10)[-1][0]
 
 	ib10 = ic + np.argwhere(t0[ic:] < -10)[1][0]
 
 	BW10 = (lmbda[ib10] - lmbda[ia10]) * 1e3
-    
+
     # 3dB bandwidth
-	ia3 = np.argwhere(t0[0:ic] < -3)[-1][0]
+	ia3 = np.argwhere(t0[:ic] < -3)[-1][0]
 
 	ib3 = ic + np.argwhere(t0[ic:] < -3)[1][0]
 
 	BW3 = (lmbda[ib3] - lmbda[ia3]) * 1e3
-	
 
-	
+
+
 	# Crosstalk level
 	XT = -100
 	for i in range(num_channels):
-		if (i != center_channel) and (i != center_channel-1) and (i != center_channel+1) :
+		if i not in [center_channel, center_channel - 1, center_channel + 1]:
 			xt = max(TdB[ia3:ib3+1,i])
 			XT = max(XT,xt)
 
@@ -363,12 +352,12 @@ def AWG_analyse(lmbda,T):
 
 	# 1dB bandwidth
 
-	ia1 = np.argwhere(t0[0:ic] < -1)[-1][0]
+	ia1 = np.argwhere(t0[:ic] < -1)[-1][0]
 
 	ib1 = ic + np.argwhere(t0[ic:] < -1)[1][0]
 
 	BW1 = (lmbda[ib1] - lmbda[ia1]) * 1e3
-   	
+
    	# Channel spacing
 
 	ia_s = np.argwhere(TdB[:, center_channel - 1] == max(TdB[:, center_channel - 1]))[-1][0]

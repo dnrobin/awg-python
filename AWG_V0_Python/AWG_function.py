@@ -55,10 +55,7 @@ def slab_index(lmbda0,h,na,nc,ns,**kwargs):
 	if "N" not in _in.keys():
 		_in["N"] = np.inf
 
-	if "Mode" in _in.keys():
-		if _in["Mode"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Mode" not in _in.keys():
 		_in["Mode"] = "TE"
 	if type(na) == types.FunctionType:
 		na = na(lmbda0)
@@ -73,45 +70,32 @@ def slab_index(lmbda0,h,na,nc,ns,**kwargs):
 	if _in["Mode"] in ["TE","te"]:
 		B1 = lambda a : np.sqrt(((ns/nc)**2 - np.sin(a)**2)+0j)
 		r1 = lambda a : (np.cos(a)-B1(a))/(np.cos(a)+B1(a))
-		
+
 		B2 = lambda a : np.sqrt(((na/nc)**2 - np.sin(a)**2)+0j)
-		r2 = lambda a : (np.cos(a)-B2(a))/(np.cos(a)+B2(a))
-
-		phi1 = lambda a : np.angle(r1(a))
-		phi2 = lambda a : np.angle(r2(a))
-
-		M = math.floor((4*np.pi*h*nc/lmbda0*np.cos(a0)+phi1(a0) + phi2(a0))/(2*np.pi))
-		neff = np.zeros(min(_in["N"],M+1))
-		for m in range(min(_in["N"],M+1)):
-			a = root(lambda t : 4*np.pi*h*nc/lmbda0*np.cos(t)+phi1(t)+phi2(t)-2*(m)*np.pi,1)
-			neff[m] = np.sin(a.x)*nc
-		return neff
 	else:
 		B1 = lambda a : (nc/ns)**2*np.sqrt(((ns/nc)**2 - np.sin(a)**2)+0j)
 		r1 = lambda a : (np.cos(a)-B1(a))/(np.cos(a)+B1(a))
-		
-		B2 = lambda a : (nc/na)**2*np.sqrt(((na/nc)**2 - np.sin(a)**2)+0j)
-		r2 = lambda a : (np.cos(a)-B2(a))/(np.cos(a)+B2(a))
 
-		phi1 = lambda a : np.angle(r1(a))
-		phi2 = lambda a : np.angle(r2(a))
+		B2 = lambda a : (nc/na)**2*np.sqrt(((na/nc)**2 - np.sin(a)**2)+0j)		
 
-		M = math.floor((4*np.pi*h*nc/lmbda0*np.cos(a0)+phi1(a0) + phi2(a0))/(2*np.pi))
-		neff = np.zeros(min(_in["N"],M+1))
-		for m in range(min(_in["N"],M+1)):
-			a = root(lambda t : 4*np.pi*h*nc/lmbda0*np.cos(t)+phi1(t)+phi2(t)-2*(m)*np.pi,1)
-			neff[m] = np.sin(a.x)*nc
-		return neff		
+	r2 = lambda a : (np.cos(a)-B2(a))/(np.cos(a)+B2(a))
+
+	phi1 = lambda a : np.angle(r1(a))
+	phi2 = lambda a : np.angle(r2(a))
+
+	M = math.floor((4*np.pi*h*nc/lmbda0*np.cos(a0)+phi1(a0) + phi2(a0))/(2*np.pi))
+	neff = np.zeros(min(_in["N"],M+1))
+	for m in range(min(_in["N"],M+1)):
+		a = root(lambda t : 4*np.pi*h*nc/lmbda0*np.cos(t)+phi1(t)+phi2(t)-2*(m)*np.pi,1)
+		neff[m] = np.sin(a.x)*nc
+	return neff		
 
 def eim_index(lmbda0,w,h,e,na,nc,ns,**kwargs):
 	_in = kwargs
 	if "N" not in _in.keys():
 		_in["N"] = np.inf
 
-	if "Mode" in _in.keys():
-		if _in["Mode"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Mode" not in _in.keys():
 		_in["Mode"] = "TE"
 	if type(na) == types.FunctionType:
 		na = na(lmbda0)
@@ -125,9 +109,7 @@ def eim_index(lmbda0,w,h,e,na,nc,ns,**kwargs):
 	neff_I = slab_index(lmbda0,h,na,nc,ns,N = _in["N"], Mode = _in["Mode"])
 
 	if e == 0:
-		neff = neff_I
-		return neff
-
+		return neff_I
 	if e < h:
 		neff_II = slab_index(lmbda0,h-e,na,nc,ns,N = _in["N"],Mode = _in["Mode"])
 	else:
@@ -141,29 +123,22 @@ def eim_index(lmbda0,w,h,e,na,nc,ns,**kwargs):
 			neff_II = [neff_II]
 		for m in range(min(len(neff_I),len(neff_II))):
 			n = slab_index(lmbda0,w,neff_II[m],neff_I[m],neff_II[m],N = _in["N"],Mode = "TM")
-			for i in n:
-				if i > max(ns,na):
-					neff.append(i)
-		return neff
+			neff.extend(i for i in n if i > max(ns,na))
 	else:
 		for m in range(min(len(neff_I),len(neff_II))):
 			n = slab_index(lmbda0,w,neff_II[m],neff_I[m],neff_II[m],N = _in["N"],Mode = "TE")
-			for i in n:
-				if i > max(ns,na):
-					neff.append(i)
-		return neff
+			neff.extend(i for i in n if i > max(ns,na))
+
+	return neff
 
 def slab_mode(lmbda0,h,na,nc,ns,**kwargs):
 	n0 = 120*np.pi
-	
+
 	_in = kwargs
 	if "y" not in _in.keys():
 		_in["y"] = []
 
-	if "Mode" in _in.keys():
-		if _in["Mode"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Mode" not in _in.keys():
 		_in["Mode"] = "TE"
 
 	if "Range" not in _in.keys():
@@ -188,7 +163,7 @@ def slab_mode(lmbda0,h,na,nc,ns,**kwargs):
 	for i in range(len(y)):
 		if y[i] < -h/2:
 			i1.append(i)
-		elif y[i] <= h/2 and y[i] >= -h/2:
+		elif y[i] <= h / 2:
 			i2.append(i)
 		else:
 			i3.append(i)
@@ -210,7 +185,7 @@ def slab_mode(lmbda0,h,na,nc,ns,**kwargs):
 			Em2 = np.cos(k*y[i2] - f)
 			Em3 = np.cos(k*h/2 - f)*np.exp(q*(h/2 - y[i3]))
 			Em = np.concatenate((Em1,Em2,Em3))*C
-			
+
 
 			H[:,m,1] = neff[m]/n0*Em
 			H[:,m,2] = 1j/(k0*n0)*np.concatenate((np.zeros(1),np.diff(Em)))
@@ -243,18 +218,15 @@ def eim_mode(lmbda0,w,h,e,na,nc,ns,**kwargs):
 	e = clamp(e,0,h)
 
 	_in = kwargs
-	
+
 	if "x" not in _in.keys():
 		_in["x"] = []
 	if "y" not in _in.keys():
 		_in["y"] = []
 
-	if "Mode" in _in.keys():
-		if _in["Mode"] in ["TE","te","TM","tm"]:
-			pass
-	else:
+	if "Mode" not in _in.keys():
 		_in["Mode"] = "TE"
-	
+
 	if "XRange" not in _in.keys():
 		_in["XRange"] = [-3*w,3*w]
 	if "YRange" not in _in.keys():
@@ -271,31 +243,28 @@ def eim_mode(lmbda0,w,h,e,na,nc,ns,**kwargs):
 
 	if _in["x"] == []:
 		x = np.linspace(_in["XRange"][0],_in["XRange"][1],_in["Sample"])
+	elif _in["y"] == []:
+		raise ValueError("x-coordinates were provided but not y.")
 	else:
-		if _in["y"] == []:
-			raise ValueError("x-coordinates were provided but not y.")
 		x = _in["x"]
 
 	Nx = len(x)
 	dx = x[1]-x[0]
 
-	if _in["y"] == []:
-		y = np.linspace(_in["YRange"][0],_in["YRange"][-1],_in["Sample"])
-	else:
-		y = _in["y"]
-	Ny = len(y)
+	y = (
+		np.linspace(_in["YRange"][0], _in["YRange"][-1], _in["Sample"])
+		if _in["y"] == []
+		else _in["y"]
+	)
 	dy = y[1]-y[0]
-	if _in["Mode"] in ["TE","te"]:
+	if _in["Mode"] in ["TE", "te"]:
 		neff = eim_index(lmbda0,w,h,e,na,nc,ns,Mode = "TE",N = 1)
 
 		[ _ , E_I,H_I] = slab_mode(lmbda0,h,na,nc,ns, y = y, Mode = "TE")
 		n_I = slab_index(lmbda0,h,na,nc,ns,N = 1)
-		if e < h :
-			n_II = slab_index(lmbda0,h-e,na,nc,ns,N = 1)
-		else:
-			n_II = na
-
+		n_II = slab_index(lmbda0,h-e,na,nc,ns,N = 1) if e < h else na
 		[ _ ,E_III,H_III] = slab_mode(lmbda0, w, n_II, n_I, n_II, y = x, Mode = 'TM')
+		Ny = len(y)
 		E = np.zeros((Nx, Ny, 3),dtype = complex)
 		H = np.zeros((Nx, Ny, 3),dtype = complex)
 		#print(np.shape(E_I[:,0,0]),np.shape(E_III[:,0,1]),np.shape(E))
@@ -309,7 +278,7 @@ def eim_mode(lmbda0,w,h,e,na,nc,ns,**kwargs):
 		H[:,:,0] = mat_prod(H[:,:,0],H_III[:,0,1],H_I[:,0,0].conj())#H_I[:,0,0]*H_III[:,0,1]
 		H[:,:,1] = mat_prod(H[:,:,1],H_III[:,0,0],H_I[:,0,1].conj())#H_I[:,0,1]*H_III[:,0,0]
 		H[:,:,2] = mat_prod(H[:,:,2],H_III[:,0,2],H_I[:,0,2].conj())#H_I[:,0,2]*H_III[:,0,2]
-		
+
 		return x,y,E,H,neff
 
 	### TO DO --> MODE TM
