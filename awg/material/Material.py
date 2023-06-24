@@ -30,7 +30,7 @@ class Material:
 				pass
 			self.type = "function"
 			self.model = model
-		elif (type(model) == int) or (type(model) == float):
+		elif type(model) in [int, float]:
 			self.type = "constant"
 		elif str(type(model)) == "<class 'numpy.ndarray'>":
 			if np.size(model) == 1 :
