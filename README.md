@@ -6,7 +6,18 @@ Arrayed waveguide grating (AWG) simulator for nanophotonics designed as a series
 
 ### Dependencies
 
-The source code provided runs in Python >3.6 and uses numpy and matplotlib internally.
+The dependancies can be found in the `requirements.txt` file. Workable with python3.11 (Tested ✅)  
+In order to get the environement work as standalone, please create your own python environement and then install the requirements. The code will be ready to play 
+```shell
+python3.11 -m venv venv
+source venv/bin/activate
+pip install -r requirements.standalone.txt
+```
+
+In order to get the environement work within your code base, please make sure the following dependencies are installed, and compatible with your current environement:
+```shell
+pip install -r requirements.txt
+```
 
 ### Instructions
 

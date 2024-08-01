@@ -1,0 +1,5 @@
+numpy
+tabulate
+scypi
+jupyter
+matplotlib
